@@ -90,6 +90,10 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
                 ->publishMigrations()
                 ->askToRunMigrations()
                 ->askToStarRepoOnGitHub('laranail/license-verifier'));
+
+        if (config('license-verifier.api.enabled')) {
+            $package->hasRoute('api');
+        }
     }
 
     #[Override]
