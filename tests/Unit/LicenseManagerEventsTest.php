@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Event;
 use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\Events\GracePeriodStarted;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivated;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseHeartbeatSent;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
 use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -110,4 +119,148 @@ it('dispatches deactivated', function (): void {
 
     expect(managerWith(fakeDriver(true))->deactivate('K'))->toBeTrue();
     Event::assertDispatched(LicenseDeactivated::class);
+});
+
+function driverReturning(VerificationResult $result): Driver
+{
+    return new readonly class($result) implements Driver
+    {
+        public function __construct(private VerificationResult $result) {}
+
+        public function name(): string
+        {
+            return 'fake';
+        }
+
+        public function activate(LicenseRequest $request): VerificationResult
+        {
+            return $this->result;
+        }
+
+        public function verify(?string $key = null): VerificationResult
+        {
+            return $this->result;
+        }
+
+        public function deactivate(?string $key = null, ?string $reason = null): bool
+        {
+            return true;
+        }
+
+        public function getLicenseInfo(?string $key = null): LicenseInfo
+        {
+            return LicenseInfo::empty();
+        }
+
+        public function health(): bool
+        {
+            return true;
+        }
+
+        public function activationFields(): array
+        {
+            return [];
+        }
+
+        public function capabilities(): array
+        {
+            return [];
+        }
+    };
+}
+
+it('dispatches GracePeriodStarted only once when entering grace', function (): void {
+    Event::fake();
+
+    $driver = driverReturning(VerificationResult::valid(status: LicenseStatus::Grace));
+
+    managerWith($driver)->verify('K');
+    managerWith($driver)->verify('K'); // same status → no re-announcement
+
+    Event::assertDispatchedTimes(GracePeriodStarted::class, 1);
+});
+
+it('dispatches LicenseRevoked when verification resolves a revoked license', function (): void {
+    Event::fake();
+
+    managerWith(driverReturning(VerificationResult::invalid(LicenseStatus::Revoked)))->verify('K');
+
+    Event::assertDispatched(LicenseRevoked::class);
+});
+
+it('dispatches refresh / heartbeat / seat-revoked events from the manager', function (): void {
+    Event::fake();
+
+    $driver = new readonly class implements Driver, SupportsHeartbeat, SupportsRefresh, SupportsSeatManagement
+    {
+        public function name(): string
+        {
+            return 'fake';
+        }
+
+        public function activate(LicenseRequest $request): VerificationResult
+        {
+            return VerificationResult::valid();
+        }
+
+        public function verify(?string $key = null): VerificationResult
+        {
+            return VerificationResult::valid();
+        }
+
+        public function deactivate(?string $key = null, ?string $reason = null): bool
+        {
+            return true;
+        }
+
+        public function getLicenseInfo(?string $key = null): LicenseInfo
+        {
+            return LicenseInfo::empty();
+        }
+
+        public function health(): bool
+        {
+            return true;
+        }
+
+        public function activationFields(): array
+        {
+            return [];
+        }
+
+        public function capabilities(): array
+        {
+            return [];
+        }
+
+        public function refresh(?string $key = null): bool
+        {
+            return true;
+        }
+
+        public function heartbeat(?string $key = null): bool
+        {
+            return true;
+        }
+
+        public function listSeats(?string $key = null): array
+        {
+            return [];
+        }
+
+        public function revokeSeat(string $target, ?string $key = null): bool
+        {
+            return true;
+        }
+    };
+
+    $manager = managerWith($driver);
+
+    expect($manager->refresh('K'))->toBeTrue();
+    expect($manager->heartbeat('K'))->toBeTrue();
+    expect($manager->revokeSeat('machine-1', 'K'))->toBeTrue();
+
+    Event::assertDispatched(LicenseRefreshed::class);
+    Event::assertDispatched(LicenseHeartbeatSent::class);
+    Event::assertDispatched(LicenseSeatRevoked::class, fn ($e): bool => $e->target === 'machine-1');
 });

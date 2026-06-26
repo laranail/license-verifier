@@ -149,7 +149,36 @@ class LicenseManager
             ? $this->eventVerified($key, $result->licensedTo)
             : $this->eventUnverified($key);
 
+        $this->announceTransition($key, $result);
+
         return $result;
+    }
+
+    /**
+     * Fire once-per-transition events (grace entered, revoked) by tracking the
+     * last-announced status for the key, so a repeated verify() does not spam.
+     */
+    private function announceTransition(?string $key, VerificationResult $result): void
+    {
+        if (! (bool) config('license-verifier.events.enabled', true)) {
+            return;
+        }
+
+        $cacheKey = $this->cacheKey($key).':status';
+        $previous = $this->cache()->get($cacheKey);
+        $current = $result->status->value;
+
+        if ($previous === $current) {
+            return;
+        }
+
+        match ($result->status) {
+            LicenseStatus::Grace => $this->eventGraceStarted($key, $result->licensedTo),
+            LicenseStatus::Revoked => $this->eventRevoked($key, $result->licensedTo),
+            default => null,
+        };
+
+        $this->cache()->put($cacheKey, $current, now()->addDays(30));
     }
 
     /**
@@ -367,7 +396,13 @@ class LicenseManager
     {
         $driver = $this->activeDriver();
 
-        return $driver instanceof SupportsRefresh && $driver->refresh($key);
+        $refreshed = $driver instanceof SupportsRefresh && $driver->refresh($key);
+
+        if ($refreshed) {
+            $this->eventRefreshed($key);
+        }
+
+        return $refreshed;
     }
 
     public function heartbeat(?string $key = null): bool
@@ -375,7 +410,17 @@ class LicenseManager
         $driver = $this->activeDriver();
 
         // Drivers that do not support heartbeats simply succeed (no-op).
-        return $driver instanceof SupportsHeartbeat ? $driver->heartbeat($key) : true;
+        if (! $driver instanceof SupportsHeartbeat) {
+            return true;
+        }
+
+        $sent = $driver->heartbeat($key);
+
+        if ($sent) {
+            $this->eventHeartbeatSent($key);
+        }
+
+        return $sent;
     }
 
     /**
@@ -427,7 +472,13 @@ class LicenseManager
     {
         $driver = $this->activeDriver();
 
-        return $driver instanceof SupportsSeatManagement && $driver->revokeSeat($target, $key);
+        $revoked = $driver instanceof SupportsSeatManagement && $driver->revokeSeat($target, $key);
+
+        if ($revoked) {
+            $this->eventSeatRevoked($target, $key);
+        }
+
+        return $revoked;
     }
 
     public function supportsSeatManagement(): bool
