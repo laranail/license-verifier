@@ -33,8 +33,8 @@ it('reports doctor diagnostics (json content)', function (): void {
     Artisan::call('license:doctor', ['--json' => true]);
 
     expect(Artisan::output())
-        ->toContain('Driver resolves')
-        ->toContain('Sodium extension');
+        ->toContain('license-verifier:driver')
+        ->toContain('license-verifier:sodium');
 });
 
 it('clears stored license data with --force', function (): void {
