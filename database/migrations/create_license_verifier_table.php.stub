@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('license_verifier_licenses', function (Blueprint $table): void {
+            $table->id();
+            $table->string('key')->unique();
+            $table->string('driver')->nullable();
+            $table->text('token')->nullable();
+            $table->string('fingerprint')->nullable();
+            $table->string('domain')->nullable();
+            $table->string('licensed_to')->nullable();
+            $table->string('status')->nullable();
+            $table->timestamp('activated_at')->nullable();
+            $table->timestamp('last_validated_at')->nullable();
+            $table->timestamp('last_heartbeat_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->json('metadata')->nullable();
+            $table->timestamps();
+
+            $table->index('fingerprint');
+            $table->index('status');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('license_verifier_licenses');
+    }
+};
