@@ -83,6 +83,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
                 WatchCommand::class,
                 SeatsCommand::class,
             )
+            ->hasDoctorChecks(DoctorCommand::CHECKS)
             ->registerRouteMiddleware('license', CheckLicense::class)
             ->hasInstallCommand(fn ($command) => $command
                 ->publishConfigFile()
