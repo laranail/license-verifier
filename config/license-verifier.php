@@ -319,4 +319,19 @@ return [
     |--------------------------------------------------------------------------
     */
     'debug' => (bool) $env('DEBUG', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Health endpoint (opt-in)
+    |--------------------------------------------------------------------------
+    |
+    | Off by default — this is a headless client. When enabled, GET
+    | {prefix}/health returns the doctor checks as JSON (200 healthy /
+    | 503 degraded) for monitoring.
+    */
+    'api' => [
+        'enabled' => (bool) $env('API_ENABLED', false),
+        'prefix' => (string) $env('API_PREFIX', 'api/license-verifier/v1'),
+        'middleware' => ['api'],
+    ],
 ];
