@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers\Concerns;
 
+use Simtabi\Laranail\Licence\Verifier\Events\GracePeriodStarted;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivated;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivating;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseHeartbeatSent;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseInvalid;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
 
@@ -63,6 +68,41 @@ trait DispatchesLicenseEvents
     {
         if ($this->eventsEnabled()) {
             LicenseInvalid::dispatch($key);
+        }
+    }
+
+    protected function eventRevoked(?string $key, ?string $licensedTo = null): void
+    {
+        if ($this->eventsEnabled()) {
+            LicenseRevoked::dispatch($key, $licensedTo);
+        }
+    }
+
+    protected function eventGraceStarted(?string $key, ?string $licensedTo = null): void
+    {
+        if ($this->eventsEnabled()) {
+            GracePeriodStarted::dispatch($key, $licensedTo);
+        }
+    }
+
+    protected function eventRefreshed(?string $key, ?string $licensedTo = null): void
+    {
+        if ($this->eventsEnabled()) {
+            LicenseRefreshed::dispatch($key, $licensedTo);
+        }
+    }
+
+    protected function eventHeartbeatSent(?string $key): void
+    {
+        if ($this->eventsEnabled()) {
+            LicenseHeartbeatSent::dispatch($key);
+        }
+    }
+
+    protected function eventSeatRevoked(?string $target, ?string $key = null): void
+    {
+        if ($this->eventsEnabled()) {
+            LicenseSeatRevoked::dispatch($target, $key);
         }
     }
 
