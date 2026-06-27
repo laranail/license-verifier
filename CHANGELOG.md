@@ -17,6 +17,11 @@ license verification core. See `UPGRADE.md` for migration steps.
 - Facade class renamed to `Simtabi\Laranail\Licence\Verifier\Facades\LicenceVerifier`.
 - Database table renamed `licensing_client_cache` → `license_verifier_licenses`.
 - PHP floor raised to `^8.4 || ^8.5`; `paragonie/paseto` bumped to `^3.5`.
+- Doctor/config/i18n standardized on package-tools' enhanced doctor: a reusable check library
+  plus shared `DoctorReporter`/`HealthResponder` (the `doctor` command and `/health` endpoint are
+  thin shells over a single `Doctor\Checks::all()`); `->withoutConfigNamespacing()` so config
+  defaults resolve under `license-verifier.*`; `->hasTranslations('license-verifier')` replaces the
+  manual translation-namespace shim.
 
 ### Added (in progress)
 - Provider-agnostic driver layer with a capability model (PASETO default + marketplace
