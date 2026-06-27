@@ -32,6 +32,7 @@ use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\IpResolver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Doctor\Checks;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
 use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
 use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
@@ -60,7 +61,8 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
         $package
             ->name('laranail/license-verifier')
             ->hasConfigFile('license-verifier')
-            ->hasTranslations()
+            ->withoutConfigNamespacing()
+            ->hasTranslations('license-verifier')
             ->hasMigration('create_license_verifier_table')
             ->hasCommands(
                 ActivateLicenseCommand::class,
@@ -83,7 +85,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
                 WatchCommand::class,
                 SeatsCommand::class,
             )
-            ->hasDoctorChecks(DoctorCommand::CHECKS)
+            ->hasDoctorChecks(Checks::all())
             ->registerRouteMiddleware('license', CheckLicense::class)
             ->hasInstallCommand(fn ($command) => $command
                 ->publishConfigFile()
@@ -193,11 +195,8 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
     #[Override]
     public function packageBooted(): void
     {
-        // package-tools registers translations under the vendor/package namespace
-        // (laranail/license-verifier); also expose the short `license-verifier::`
-        // namespace that the package + presets reference.
-        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'license-verifier');
-
+        // (Short `license-verifier::` translation namespace is now registered by
+        // ->hasTranslations('license-verifier') in configurePackage.)
         $this->applyMiddlewareGroups();
         $this->scheduleHeartbeat();
     }
