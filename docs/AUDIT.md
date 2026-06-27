@@ -137,12 +137,23 @@ This section tracks the fixes. All land on `refactor/laranail-headless-verifier`
 | REM-E | `Bindings\DomainBinding` built/bound but never invoked | Enforced inside `LicenseManager::verify()` (config allowlist or the driver's `boundDomains()`); a usable result on a disallowed host is downgraded to Invalid | ☑ (`ResilienceTest` domain case) |
 | REM-F | CLI output content untested; a `--json` branch was inconsistent | `wantsJson` reads input directly; content tests (source/driver/drivers/doctor) via a stable capture path | ☑ |
 | REM-G | HTTP drivers never dispatched events; preset `deactivate`/`status` ungated; no retry/backoff; PASETO ignored `verify_tls` | Events centralised (all drivers fire them); permission gate on blade/vue mutating endpoints; retry+backoff on HTTP drivers + updater download; `LicensingApiClient` honors `verify_tls` | ☑ |
-| REM-H | i18n namespace mismatch — **all** translated strings (verifier + 4 presets) fell through to raw keys | Register the short `license-verifier::` namespace explicitly | ☑ (`TranslationTest` asserts resolution) |
+| REM-H | i18n namespace mismatch — **all** translated strings (verifier + 4 presets) fell through to raw keys | Register the short `license-verifier::` namespace — originally a manual `loadTranslationsFrom` shim, now `->hasTranslations('license-verifier')` on the package-tools builder (shim removed in STD-1) | ☑ (`TranslationTest` asserts resolution) |
 | REM-I | Stale/duplicated CI workflows; broken phpstan baseline | Consolidated to `tests.yml` (8.4/8.5) + `static-analysis.yml` (pint/phpstan/rector) | ☑ |
 | REM-SEAT | No seat list/revoke surface | `SupportsSeatManagement` + `PasetoDriver`; `LicenseManager` seat methods; `license:seats` command; kit `UsageController@index/@revoke` + routes | ☑ (verifier `SeatManagementTest`; kit API tests) |
 | REM-DOC | `AUDIT.md` read "all done"; docs lacked diagrams | This reconciliation + Mermaid-first `architecture.md`/`security.md` + README docs-index sections | ☑ |
 
-**Verifier suite after remediation: 223 passing; phpstan/pint/rector clean.** The PASETO
-engine's 54 direct-construction unit tests remain untouched and green.
+## Toolchain standardization (STD)
+
+All 5 licensing packages were standardized onto `laranail/package-tools` (provider) +
+`laranail/console` (commands), with the doctor enhanced **in package-tools** (reusable check
+library + `DoctorReporter`/`HealthResponder`) rather than as per-package band-aids. Plan +
+cross-package ledger: `~/.claude/plans/read-all-files-in-humble-sifakis.md`.
+
+| ID | Finding | Fix | Status |
+|----|---------|-----|--------|
+| STD-1 | Doctor/config/i18n were per-package band-aids (manual translation shim; package config *defaults* landed under the unread `laranail.X` namespace key; bespoke doctor command + health controller duplicated across repos) | package-tools gains a reusable check library + `DoctorReporter`/`HealthResponder`, a `hasTranslations(?alias)` short-namespace, and a `->withoutConfigNamespacing()` opt-out. The verifier adopts all three: `Doctor\Checks::all()` is the one canonical list (reusable PhpExtension/ConfigPresent/Reachability + the package-specific driver/public-key/storage checks); `DoctorCommand`/`HealthController` are thin shells; config defaults resolve under `license-verifier.*`; the i18n shim is gone | ☑ (256 passing; pint/phpstan/rector clean) |
+
+**Verifier suite after remediation + standardization: 256 passing; phpstan/pint/rector clean.**
+The PASETO engine's 54 direct-construction unit tests remain untouched and green.
 
 [← Docs index](../README.md#documentation)
