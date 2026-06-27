@@ -92,10 +92,6 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
                 ->publishMigrations()
                 ->askToRunMigrations()
                 ->askToStarRepoOnGitHub('laranail/license-verifier'));
-
-        if (config('license-verifier.api.enabled')) {
-            $package->hasRoute('api');
-        }
     }
 
     #[Override]
@@ -197,8 +193,22 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
     {
         // (Short `license-verifier::` translation namespace is now registered by
         // ->hasTranslations('license-verifier') in configurePackage.)
+        $this->registerApiRoutes();
         $this->applyMiddlewareGroups();
         $this->scheduleHeartbeat();
+    }
+
+    /**
+     * Load the API routes when enabled — at boot, where the merged config is
+     * authoritative. Gating at configurePackage() time reads config before the package
+     * config is merged, so an app that has not published the config (but set
+     * `API_ENABLED=true` in .env) would silently never register the API routes.
+     */
+    private function registerApiRoutes(): void
+    {
+        if (config('license-verifier.api.enabled')) {
+            $this->loadRoutesFrom($this->package->basePath('/routes/api.php'));
+        }
     }
 
     /**
