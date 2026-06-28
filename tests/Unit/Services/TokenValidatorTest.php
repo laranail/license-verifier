@@ -231,10 +231,8 @@ it('validates a valid certificate chain', function (): void {
 
     $this->validator->setRootPublicKey($chainData['root_public_key']);
 
-    $token = $this->generateTestTokenWithFooter([], [
-        'kid' => 'test-signing-key',
-        'chain' => $chainData['chain'],
-    ]);
+    // The token is signed by the chain's signing key; the cert binds that key.
+    $token = $this->generateTestTokenSignedByChain($chainData);
 
     $claims = $this->validator->validate($token);
 
@@ -252,10 +250,7 @@ it('rejects token with invalid certificate signature in chain', function (): voi
     $tamperedCert['signature'] = base64_encode(random_bytes(64));
     $chain['signing']['certificate'] = json_encode($tamperedCert);
 
-    $token = $this->generateTestTokenWithFooter([], [
-        'kid' => 'test-signing-key',
-        'chain' => $chain,
-    ]);
+    $token = $this->generateTestTokenSignedByChain($chainData, [], $chain);
 
     $this->validator->validate($token);
 })->throws(LicensingException::class, 'Certificate chain verification failed.');
@@ -266,10 +261,30 @@ it('rejects token with wrong root key in chain', function (): void {
     $wrongRootKey = base64_encode(sodium_crypto_sign_publickey(sodium_crypto_sign_keypair()));
     $this->validator->setRootPublicKey($wrongRootKey);
 
-    $token = $this->generateTestTokenWithFooter([], [
-        'kid' => 'test-signing-key',
-        'chain' => $chainData['chain'],
-    ]);
+    $token = $this->generateTestTokenSignedByChain($chainData);
+
+    $this->validator->validate($token);
+})->throws(LicensingException::class, 'Certificate chain verification failed.');
+
+it('rejects a forged token pairing a legitimate certificate with a substituted signing key', function (): void {
+    // Upstream masterix21/laravel-licensing 2.2.0 (commit 7accdc3): an attacker takes
+    // a legitimate root-signed certificate, advertises their OWN signing key in the
+    // footer, and signs a forged token with it. The cert↔key binding must reject it.
+    $chainData = $this->generateTestCertificateChain();
+    $this->validator->setRootPublicKey($chainData['root_public_key']);
+
+    $attacker = sodium_crypto_sign_keypair();
+
+    $forgedChain = $chainData['chain'];
+    // Keep the legitimate (root-signed) certificate, but advertise the attacker key
+    // and sign the token with it.
+    $forgedChain['signing']['public_key'] = base64_encode(sodium_crypto_sign_publickey($attacker));
+
+    $token = $this->generateTestTokenSignedByChain(
+        ['signing_secret_key' => sodium_crypto_sign_secretkey($attacker)] + $chainData,
+        [],
+        $forgedChain,
+    );
 
     $this->validator->validate($token);
 })->throws(LicensingException::class, 'Certificate chain verification failed.');

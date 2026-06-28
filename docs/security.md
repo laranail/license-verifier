@@ -92,6 +92,15 @@ flowchart TD
 
 - Offline PASETO tokens are verified with the **public** key bundle (Ed25519); the signing
   key never leaves the issuer.
+- **Certificate chain binding.** A token may carry a certificate chain in its footer for
+  signing-key rotation (root → signing cert → signing key). `TokenValidator` verifies the
+  chain root against the pinned root, confirms the signing certificate is root-signed, and
+  constant-time checks (`hash_equals`) that the certificate **vouches for the exact signing
+  key**, then verifies the token with that cert-bound key. This prevents pairing a
+  legitimate root-signed certificate with a substituted signing key (forgery). Mirrors
+  `laranail/license-kit`'s `PasetoTokenService::verifyOffline`; aligned with upstream
+  `masterix21/laravel-licensing` 2.2.0. (Non-chained tokens are verified with the
+  configured public key as before.)
 - Grace is bounded by `grace_period_days`; after it elapses the app fails closed.
 - `fail_open_in_grace=false` makes any unreachable source fail closed immediately.
 

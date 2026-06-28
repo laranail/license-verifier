@@ -2,10 +2,35 @@
 
 All notable changes to `laranail/license-verifier` will be documented in this file.
 
-## Unreleased
+## [Unreleased]
+
+## [0.1.0] - 2026-06-28
 
 Hard fork under the laranail org. The package is now a headless, provider-agnostic
 license verification core. See `UPGRADE.md` for migration steps.
+
+### Security
+- **Offline token forgery via certificate/key substitution** — `TokenValidator` now
+  verifies a chained (rotating-key) token with the **cert-bound** signing key from the
+  footer and constant-time checks (`hash_equals`) that the root-signed certificate
+  vouches for that exact key. Previously the chain was verified for root-signedness
+  only, so a legitimate certificate could be paired with a substituted signing key.
+  Ported from upstream `masterix21/laravel-licensing` 2.2.0 (commit `7accdc3`),
+  matching the equivalent check already in `laranail/license-kit`'s
+  `PasetoTokenService::verifyOffline`. Behavioral note: chained tokens are now
+  verified with the cert-bound signing key (rotation), not the static configured key;
+  non-chained tokens are unaffected. Public API unchanged.
+
+### Added
+- **Whop** driver (`whop`) — membership validation via the Whop Memberships API.
+- **Anystack** driver (`anystack`) — activate/validate/deactivate via Anystack v1,
+  with host-bound activation (`SupportsDomainBinding`).
+- **Multi-source activation** — `LicenseManager::activateAcross()` tries an ordered
+  list of drivers (`license-verifier.sources`); first usable result wins and becomes
+  the default.
+- **Activation rate limiting** — opt-in per-key throttle (`license-verifier.rate_limit`).
+- **Activation audit log** — opt-in provenance log of activation outcomes
+  (`license-verifier.audit`); never logs the raw key.
 
 ### Changed (BREAKING)
 - Replaced `spatie/laravel-package-tools` with `laranail/package-tools`.
