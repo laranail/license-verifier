@@ -95,7 +95,19 @@ class TestCase extends Orchestra
         $this->initializeTestProperties();
         $builder = Builder::getPublic($this->privateKey, new Version4);
 
-        $defaultClaims = [
+        return $builder
+            ->withClaims(array_merge($this->defaultTestClaims(), $claims))
+            ->toString();
+    }
+
+    /**
+     * The default claim set shared by the token helpers.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultTestClaims(): array
+    {
+        return [
             'sub' => '1',
             'iss' => 'laravel-licensing',
             'license_id' => 1,
@@ -104,16 +116,12 @@ class TestCase extends Orchestra
             'status' => 'active',
             'max_usages' => 5,
             'exp' => now()->addYear()->toIso8601String(),
-            'nbf' => now()->toIso8601String(),
-            'iat' => now()->toIso8601String(),
+            // Slightly in the past so PASETO's nbf/iat checks never race the
+            // parse-time clock (deterministic across runs).
+            'nbf' => now()->subMinute()->toIso8601String(),
+            'iat' => now()->subMinute()->toIso8601String(),
             'force_online_after' => now()->addDays(14)->toIso8601String(),
         ];
-
-        $finalClaims = array_merge($defaultClaims, $claims);
-
-        return $builder
-            ->withClaims($finalClaims)
-            ->toString();
     }
 
     /**
@@ -127,32 +135,37 @@ class TestCase extends Orchestra
         $this->initializeTestProperties();
         $builder = Builder::getPublic($this->privateKey, new Version4);
 
-        $defaultClaims = [
-            'sub' => '1',
-            'iss' => 'laravel-licensing',
-            'license_id' => 1,
-            'license_key_hash' => hash('sha256', 'TEST-LICENSE-KEY'),
-            'usage_fingerprint' => app(FingerprintGenerator::class)->generate(),
-            'status' => 'active',
-            'max_usages' => 5,
-            'exp' => now()->addYear()->toIso8601String(),
-            'nbf' => now()->toIso8601String(),
-            'iat' => now()->toIso8601String(),
-            'force_online_after' => now()->addDays(14)->toIso8601String(),
-        ];
-
-        $finalClaims = array_merge($defaultClaims, $claims);
-
         return $builder
-            ->withClaims($finalClaims)
+            ->withClaims(array_merge($this->defaultTestClaims(), $claims))
             ->setFooterArray($footer)
+            ->toString();
+    }
+
+    /**
+     * Generate a token actually SIGNED by a certificate chain's signing key, with the
+     * chain in its footer — the realistic shape for cert-chain verification. The
+     * cert-bound signing key is the one that verifies the token.
+     *
+     * @param  array{signing_secret_key: string, chain: array<string, mixed>}  $chainData
+     * @param  array<string, mixed>  $claims
+     * @param  array<string, mixed>|null  $footerChain  override the footer chain (e.g. to forge a mismatch)
+     */
+    protected function generateTestTokenSignedByChain(array $chainData, array $claims = [], ?array $footerChain = null): string
+    {
+        $this->initializeTestProperties();
+
+        $signingKey = new \ParagonIE\Paseto\Keys\Version4\AsymmetricSecretKey($chainData['signing_secret_key']);
+
+        return Builder::getPublic($signingKey, new Version4)
+            ->withClaims(array_merge($this->defaultTestClaims(), $claims))
+            ->setFooterArray(['chain' => $footerChain ?? $chainData['chain']])
             ->toString();
     }
 
     /**
      * Generate a test root+signing keypair and signed certificate for chain verification tests
      *
-     * @return array{root_public_key: string, signing_public_key: string, chain: array<string, mixed>}
+     * @return array{root_public_key: string, signing_public_key: string, signing_secret_key: string, chain: array<string, mixed>}
      */
     protected function generateTestCertificateChain(): array
     {
@@ -162,6 +175,7 @@ class TestCase extends Orchestra
 
         $signingKeypair = sodium_crypto_sign_keypair();
         $signingPublicKey = sodium_crypto_sign_publickey($signingKeypair);
+        $signingSecretKey = sodium_crypto_sign_secretkey($signingKeypair);
 
         $certificate = [
             'kid' => 'test-signing-key',
@@ -182,6 +196,7 @@ class TestCase extends Orchestra
         return [
             'root_public_key' => base64_encode($rootPublicKey),
             'signing_public_key' => base64_encode($signingPublicKey),
+            'signing_secret_key' => $signingSecretKey,
             'chain' => [
                 'signing' => [
                     'kid' => 'test-signing-key',

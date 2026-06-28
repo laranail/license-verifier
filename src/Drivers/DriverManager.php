@@ -99,6 +99,16 @@ class DriverManager extends Manager
         return new UnlockShDriver($this->driverConfig('unlocksh'));
     }
 
+    protected function createWhopDriver(): Driver
+    {
+        return new WhopDriver($this->driverConfig('whop'));
+    }
+
+    protected function createAnystackDriver(): Driver
+    {
+        return new AnystackDriver($this->driverConfig('anystack'));
+    }
+
     protected function createGenericDriver(): Driver
     {
         return new GenericHttpDriver($this->driverConfig('generic'));

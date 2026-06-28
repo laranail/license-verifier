@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier;
 
 use Carbon\Carbon;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
@@ -117,6 +119,10 @@ class LicenseManager
             ? $request
             : new LicenseRequest($request, client: $client);
 
+        if (($throttled = $this->throttle($request->key)) instanceof VerificationResult) {
+            return $throttled;
+        }
+
         $this->eventActivating($request->key, $request->client);
 
         try {
@@ -138,7 +144,88 @@ class LicenseManager
             ? $this->eventActivated($request->key, $result->licensedTo ?? $request->client)
             : $this->eventInvalid($request->key);
 
+        $this->audit($request->key, $result);
+
         return $result;
+    }
+
+    /**
+     * Append-only activation audit (opt-in via `license-verifier.audit`). Records
+     * provenance — never the raw key/secret — to the configured log channel.
+     */
+    private function audit(string $key, VerificationResult $result): void
+    {
+        if (! (bool) config('license-verifier.audit.enabled', false)) {
+            return;
+        }
+
+        Log::channel(config('license-verifier.audit.channel'))->info('license.activation', [
+            'key_hash' => substr(hash('sha256', $key), 0, 16),
+            'driver' => $this->resolvedDriverName(),
+            'status' => $result->status->value,
+            'valid' => $result->valid,
+            'licensed_to' => $result->licensedTo,
+            'at' => Carbon::now()->toIso8601String(),
+        ]);
+    }
+
+    /**
+     * Multi-source activation: try each driver in order and keep the first usable
+     * result (for products sold through several channels). On success the winning
+     * driver becomes the default so verify/deactivate target it. With no `$sources`
+     * (and none configured) this is just {@see activate()} on the default driver.
+     *
+     * @param  list<string>|null  $sources  driver names; defaults to config('license-verifier.sources')
+     */
+    public function activateAcross(string|LicenseRequest $request, ?array $sources = null, ?string $client = null): VerificationResult
+    {
+        $sources ??= array_values(array_filter((array) config('license-verifier.sources', [])));
+
+        if ($sources === []) {
+            return $this->activate($request, $client);
+        }
+
+        $last = VerificationResult::invalid(LicenseStatus::Invalid, message: 'No license source accepted the credentials.');
+
+        foreach ($sources as $name) {
+            $result = $this->driver($name)->activate($request, $client);
+
+            if ($result->isUsable()) {
+                $this->configure(['default' => $name]);
+
+                return $result;
+            }
+
+            $last = $result;
+        }
+
+        return $last;
+    }
+
+    /**
+     * Per-key activation rate limiting (opt-in via `license-verifier.rate_limit`).
+     * Returns an invalid result when the limit is exceeded, otherwise records a hit.
+     */
+    private function throttle(string $key): ?VerificationResult
+    {
+        if (! (bool) config('license-verifier.rate_limit.enabled', false)) {
+            return null;
+        }
+
+        $limiter = app(RateLimiter::class);
+        $bucket = 'license-verifier:activate:'.sha1($key);
+        $max = (int) config('license-verifier.rate_limit.max_attempts', 5);
+
+        if ($limiter->tooManyAttempts($bucket, $max)) {
+            return VerificationResult::invalid(
+                LicenseStatus::Unreachable,
+                message: "Too many activation attempts. Try again in {$limiter->availableIn($bucket)} seconds.",
+            );
+        }
+
+        $limiter->hit($bucket, (int) config('license-verifier.rate_limit.decay_seconds', 300));
+
+        return null;
     }
 
     public function verify(?string $key = null): VerificationResult

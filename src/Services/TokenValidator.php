@@ -33,18 +33,20 @@ class TokenValidator
      */
     public function validate(string $token): array
     {
-        if (! $this->publicKey instanceof AsymmetricPublicKey) {
-            throw LicensingException::publicKeyMissing();
-        }
-
         try {
-            $parsedToken = $this->parser->parse($token);
-            $claims = $parsedToken->getClaims();
-
             $footer = $this->extractFooter($token);
 
-            if (! empty($footer['chain']) && ! $this->verifyCertificateChain($footer)) {
-                throw LicensingException::invalidCertificateChain();
+            if (! empty($footer['chain'])) {
+                // Chained (rotating-key) token: verify the certificate chain AND
+                // verify the token with the cert-bound signing key from the footer —
+                // mirroring license-kit's PasetoTokenService::verifyOffline.
+                $claims = $this->verifyChainedToken($token, $footer['chain']);
+            } else {
+                if (! $this->publicKey instanceof AsymmetricPublicKey) {
+                    throw LicensingException::publicKeyMissing();
+                }
+
+                $claims = $this->parser->parse($token)->getClaims();
             }
 
             if (! $this->validateFingerprint($claims)) {
@@ -263,6 +265,44 @@ class TokenValidator
     }
 
     /**
+     * Verify a token that carries a certificate chain in its footer.
+     *
+     * Validates the chain (root match, certificate root-signed, and — crucially —
+     * the certificate binds the signing key), then verifies the token itself with
+     * that cert-bound signing key. This mirrors license-kit's
+     * `PasetoTokenService::verifyOffline` so the rotating signing key advertised in
+     * the footer is the one that actually verifies the token.
+     *
+     * @param  array<string, mixed>  $chain
+     * @return array<string, mixed>
+     */
+    protected function verifyChainedToken(string $token, array $chain): array
+    {
+        if (! $this->verifyCertificateChain(['chain' => $chain])) {
+            throw LicensingException::invalidCertificateChain();
+        }
+
+        try {
+            $signingKey = new \ParagonIE\Paseto\Keys\Version4\AsymmetricPublicKey(
+                base64_decode((string) ($chain['signing']['public_key'] ?? ''), true) ?: ''
+            );
+        } catch (Throwable) {
+            throw LicensingException::invalidCertificateChain();
+        }
+
+        $parser = Parser::getPublic($signingKey, ProtocolCollection::v4());
+        $parser->setNonExpiring(true);
+
+        $issuer = config('license-verifier.issuer');
+
+        if ($issuer) {
+            $parser->addRule(new IssuedBy($issuer));
+        }
+
+        return $parser->parse($token)->getClaims();
+    }
+
+    /**
      * Verify the certificate chain from the token footer against the stored root key
      *
      * @param  array<string, mixed>  $footer
@@ -291,7 +331,21 @@ class TokenValidator
             return false;
         }
 
-        return $this->verifyCertificateSignature($signingCertificate, $this->rootPublicKey);
+        if (! $this->verifyCertificateSignature($signingCertificate, $this->rootPublicKey)) {
+            return false;
+        }
+
+        // SECURITY (upstream masterix21/laravel-licensing 2.2.0, commit 7accdc3):
+        // the root-signed certificate must vouch for the EXACT key that verifies the
+        // token. Without this constant-time cross-check, a legitimate (root-signed)
+        // certificate can be paired with a substituted signing key and a forged token.
+        $signingPublicKey = $chain['signing']['public_key'] ?? null;
+        $certData = json_decode((string) $signingCertificate, true);
+        $certBoundKey = is_array($certData) ? ($certData['certificate']['public_key'] ?? null) : null;
+
+        return is_string($certBoundKey)
+            && is_string($signingPublicKey)
+            && hash_equals($certBoundKey, $signingPublicKey);
     }
 
     /**

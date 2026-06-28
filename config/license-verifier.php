@@ -34,6 +34,40 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Multi-source activation
+    |--------------------------------------------------------------------------
+    | Optional ordered list of driver names tried by LicenseManager::activateAcross()
+    | — the first source that accepts the credentials wins (for products sold
+    | through several channels). Empty = single-driver activation via `default`.
+    */
+    'sources' => array_values(array_filter(explode(',', (string) $env('SOURCES', '')))),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activation rate limiting
+    |--------------------------------------------------------------------------
+    | Opt-in per-key throttle around activation (anti-brute-force). Off by default.
+    */
+    'rate_limit' => [
+        'enabled' => (bool) $env('RATE_LIMIT', false),
+        'max_attempts' => (int) $env('RATE_LIMIT_MAX', 5),
+        'decay_seconds' => (int) $env('RATE_LIMIT_DECAY', 300),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activation audit log
+    |--------------------------------------------------------------------------
+    | Opt-in append-only audit of activation outcomes (provenance only — never the
+    | raw key) to the given log channel (null = default).
+    */
+    'audit' => [
+        'enabled' => (bool) $env('AUDIT', false),
+        'channel' => $env('AUDIT_CHANNEL'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Shared license key / public key
     |--------------------------------------------------------------------------
     | The license key for this installation, and (for crypto drivers) the
@@ -146,6 +180,18 @@ return [
             'api_key' => $env('UNLOCKSH_API_KEY'),
             'product_id' => $env('UNLOCKSH_PRODUCT_ID'),
             'base_url' => $env('UNLOCKSH_BASE_URL', 'https://api.unlock.sh'),
+        ],
+
+        'whop' => [
+            'api_key' => $env('WHOP_API_KEY'),
+            'product_id' => $env('WHOP_PRODUCT_ID'),
+            'base_url' => $env('WHOP_BASE_URL', 'https://api.whop.com'),
+        ],
+
+        'anystack' => [
+            'api_key' => $env('ANYSTACK_API_KEY'),
+            'product_id' => $env('ANYSTACK_PRODUCT_ID'),
+            'base_url' => $env('ANYSTACK_BASE_URL', 'https://api.anystack.sh/v1'),
         ],
 
         // Configurable escape hatch — map any bespoke HTTP service without code.

@@ -26,6 +26,8 @@ interfaces, so it can never overstate — see "Capability model").
 | `woocommerce` | License Manager for WooCommerce | — | `store_url`, `consumer_key/secret` |
 | `paddle` | Paddle | — | `api_key`, `sandbox` |
 | `unlocksh` | unlock.sh | — | `api_key`, `base_url` |
+| `whop` | Whop.com memberships | — | `api_key`, `product_id` |
+| `anystack` | Anystack.sh | D | `api_key`, `product_id` |
 | `generic` | any bespoke HTTP service | configurable | `endpoints`, `response_map` |
 | `null` | dev/testing | — | refuses in production |
 
