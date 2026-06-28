@@ -2,6 +2,10 @@
 
 All notable changes to `laranail/license-verifier` will be documented in this file.
 
+## v0.1.2 - 2026-06-28
+
+Patch: require `laranail/package-tools ^1.3` (the version that introduced `withoutConfigNamespacing()`), fixing prefer-lowest dependency resolution. No API changes.
+
 ## v0.1.1 - 2026-06-28
 
 Patch release: resolve `laranail/package-tools` from Packagist and drop the unused `laranail/license-kit` dev dependency + local path repositories, so CI installs cleanly. No runtime/API changes; 265 tests green.
