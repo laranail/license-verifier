@@ -2,6 +2,10 @@
 
 All notable changes to `laranail/license-verifier` will be documented in this file.
 
+## v0.1.1 - 2026-06-28
+
+Patch release: resolve `laranail/package-tools` from Packagist and drop the unused `laranail/license-kit` dev dependency + local path repositories, so CI installs cleanly. No runtime/API changes; 265 tests green.
+
 ## v0.1.0 - 2026-06-28
 
 Hard fork under the laranail org. The package is now a headless, provider-agnostic
