@@ -1,6 +1,8 @@
 # laranail/license-verifier
 
-[![Tests](https://github.com/laranail/license-verifier/actions/workflows/tests.yml/badge.svg)](https://github.com/laranail/license-verifier/actions)
+[![Latest version on Packagist](https://img.shields.io/packagist/v/laranail/license-verifier.svg)](https://packagist.org/packages/laranail/license-verifier)
+[![Tests](https://github.com/laranail/license-verifier/actions/workflows/tests.yml/badge.svg)](https://github.com/laranail/license-verifier/actions/workflows/tests.yml)
+[![Static analysis](https://github.com/laranail/license-verifier/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/laranail/license-verifier/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > Headless, provider-agnostic license verification for Laravel — PASETO/Ed25519 offline
@@ -109,23 +111,57 @@ php artisan license:reminder skip --days=3
 
 `laranail/product-updater` consumes this package to gate downloads/updates behind a valid license.
 
-## Documentation
+## <a name="documentation"></a>Documentation
 
-| Page | What it covers |
-|------|----------------|
-| [architecture.md](docs/architecture.md) | Ecosystem + internals, sequence/flow/state diagrams (Mermaid) |
-| [security.md](docs/security.md) | Encryption pipeline, transport, offline trust model, threat checklist |
-| [drivers.md](docs/drivers.md) | The 14 drivers + capability matrix |
-| [cli.md](docs/cli.md) | Command map and flows |
-| [tui.md](docs/tui.md) | The interactive dashboards |
-| [AUDIT.md](docs/AUDIT.md) | Feature/bug/convention tracking + remediation matrix |
+Hosted at [`opensource.simtabi.com/license-verifier/docs/`](https://opensource.simtabi.com/license-verifier/docs/).
+The same pages live under [`docs/`](docs/):
 
-## Development
+### Guides
+
+- [Architecture](docs/architecture.md) — ecosystem + internals, sequence/flow/state diagrams (Mermaid).
+- [Security](docs/security.md) — encryption pipeline, transport, offline trust model, threat checklist.
+
+### Reference
+
+- [Drivers](docs/drivers.md) — the 14 drivers + capability matrix.
+- [CLI](docs/cli.md) — the command map and flows.
+- [TUI](docs/tui.md) — the interactive dashboards.
+
+### Project
+
+- [Audit](docs/AUDIT.md) — feature/bug/convention tracking + remediation matrix.
+- [Changelog](CHANGELOG.md) — release history.
+
+## Stability
+
+Pre-1.0 (0.x) — the public API may change between minor versions. Pin a version and read `UPGRADE.md`
+before bumping.
+
+## Local development
 
 ```bash
 composer test     # Pest
 composer lint     # pint --test + phpstan + rector --dry-run
 ```
 
-See `docs/AUDIT.md` for the full feature/bug/convention tracking matrix, and `UPGRADE.md`
-for migration from the pre-fork releases.
+See `docs/AUDIT.md` for the full feature/bug/convention tracking matrix, and `UPGRADE.md` for migration
+from the pre-fork releases.
+
+## Sister packages
+
+- [`laranail/license-kit`](https://github.com/laranail/license-kit) — the self-hosted PASETO licensing server (the default driver's backend).
+- [`laranail/license-verifier-ui`](https://github.com/laranail/license-verifier-ui) — Blade / Filament / Livewire / Vue UI presets.
+- [`laranail/product-updater`](https://github.com/laranail/product-updater) — gates downloads/updates behind a valid license.
+
+## Community
+
+- [Issues](https://github.com/laranail/license-verifier/issues) — bugs + feature requests.
+
+## Contributing & security
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — workflow + coding standards.
+- [SECURITY.md](SECURITY.md) — how to report a vulnerability (see also [Security](docs/security.md)).
+
+## License
+
+MIT © Simtabi LLC. See [LICENSE](LICENSE).
