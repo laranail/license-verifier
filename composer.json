@@ -11,7 +11,7 @@
         "offline-licensing",
         "laranail"
     ],
-    "homepage": "https://opensource.simtabi.com/license-verifier/",
+    "homepage": "https://opensource.simtabi.com/documentation/laranail/license-verifier/",
     "license": "MIT",
     "authors": [
         {
@@ -29,7 +29,7 @@
     "support": {
         "issues": "https://github.com/laranail/license-verifier/issues",
         "source": "https://github.com/laranail/license-verifier",
-        "docs": "https://opensource.simtabi.com/license-verifier/docs/"
+        "docs": "https://opensource.simtabi.com/documentation/laranail/license-verifier/"
     },
     "require": {
         "php": "^8.4 || ^8.5",
