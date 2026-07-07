@@ -50,6 +50,7 @@ use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
 use Simtabi\Laranail\Licence\Verifier\Support\ConnectionChecker;
 use Simtabi\Laranail\Licence\Verifier\Support\ReminderManager;
 use Simtabi\Laranail\Licence\Verifier\Support\ThirdPartyIpResolver;
+use Simtabi\Laranail\Package\Tools\Commands\InstallCommand;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 
@@ -87,11 +88,13 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
             )
             ->hasDoctorChecks(Checks::all())
             ->registerRouteMiddleware('license', CheckLicense::class)
-            ->hasInstallCommand(fn ($command) => $command
-                ->publishConfigFile()
-                ->publishMigrations()
-                ->askToRunMigrations()
-                ->askToStarRepoOnGitHub('laranail/license-verifier'));
+            ->hasInstallCommand(function (InstallCommand $command): void {
+                $command
+                    ->publishConfigFile()
+                    ->publishMigrations()
+                    ->askToRunMigrations()
+                    ->askToStarRepoOnGitHub('laranail/license-verifier');
+            });
     }
 
     #[Override]
