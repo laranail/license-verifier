@@ -38,7 +38,7 @@ All must be green. New behaviour needs a Pest test that proves it.
 ## Pull requests
 
 - Subject ≤ 72 chars, imperative mood; the body explains *why*.
-- Update `CHANGELOG.md` under `Unreleased` and `docs/AUDIT.md` where relevant.
+- Update `CHANGELOG.md` under `Unreleased` and `docs/audit.md` where relevant.
 - No AI-assistant attribution in commits or PRs.
 
 ## Credits

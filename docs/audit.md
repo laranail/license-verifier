@@ -1,4 +1,4 @@
-# Audit & Feature-Tracking Matrix — laranail licensing
+# Audit & feature-tracking matrix
 
 Master checklist for the verifier refactor + UI presets + product-updater. Status legend:
 **☐** todo · **◐** in-progress · **☑** done · **⊘** deferred (with reason).
@@ -155,5 +155,7 @@ cross-package ledger: `~/.claude/plans/read-all-files-in-humble-sifakis.md`.
 
 **Verifier suite after remediation + standardization: 256 passing; phpstan/pint/rector clean.**
 The PASETO engine's 54 direct-construction unit tests remain untouched and green.
+
+---
 
 [← Docs index](../README.md#documentation)

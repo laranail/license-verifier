@@ -155,6 +155,8 @@ stateDiagram-v2
 ```
 
 See also: [security.md](security.md) (encryption pipeline + threat model),
-[drivers.md](drivers.md), [cli.md](cli.md), [tui.md](tui.md).
+[drivers](tools/drivers.md), [the CLI](tools/cli.md), [the TUI](tools/tui.md).
+
+---
 
 [← Docs index](../README.md#documentation)

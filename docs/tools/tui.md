@@ -3,8 +3,6 @@
 `php artisan license:manage` (aliases `license`, `license:manage`) opens an interactive
 license-management dashboard built on `laranail/console`.
 
-[← Docs index](../README.md#documentation)
-
 ## What it shows
 
 A status card (driver · status · licensed-to · expiry · seats) followed by an action menu:
@@ -31,4 +29,6 @@ The TUI and every command call the same headless core (`DriverManager` / the `Li
 facade). The web GUI lives in the unified preset package (`laranail/license-verifier-ui`) and
 calls the same core — so CLI, TUI and web stay consistent for any of the 14 drivers.
 
-[← Docs index](../README.md#documentation)
+---
+
+[← Docs index](../../README.md#documentation)

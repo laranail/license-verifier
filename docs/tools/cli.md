@@ -4,8 +4,6 @@ All commands are namespaced `laranail::license-verifier.*` with short `license:*
 They share the `laranail/console` services (`$this->services->interaction()`, `display()`),
 support `--json` where noted, and return CI-friendly exit codes.
 
-[← Docs index](../README.md#documentation)
-
 ## Exit codes
 
 `0` valid / grace (or success) · `1` invalid / expired / unactivated · `2` server unreachable
@@ -64,4 +62,6 @@ if ! php artisan license:status --strict; then
 fi
 ```
 
-[← Docs index](../README.md#documentation)
+---
+
+[← Docs index](../../README.md#documentation)

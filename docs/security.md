@@ -124,4 +124,6 @@ flowchart TD
 | Unauthorized deactivation via preset UI | Gate ability check on mutating endpoints |
 | Wrong-domain license reuse | domain binding downgrades to Invalid |
 
+---
+
 [← Docs index](../README.md#documentation)

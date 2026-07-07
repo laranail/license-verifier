@@ -4,8 +4,6 @@ Set the active driver with `license-verifier.default` (env `LICENSE_VERIFIER_DRI
 driver reads its own block under `license-verifier.drivers.<name>`. All HTTP drivers verify TLS
 by default (`license-verifier.security.verify_tls`).
 
-[← Docs index](../README.md#documentation)
-
 Optional capabilities: **O** offline tokens · **R** refresh · **H** heartbeat ·
 **E** entitlements · **S** seats · **SM** seat management · **D** domain binding. Every driver
 supports the core verbs (activate / verify / deactivate) regardless; the column below lists only
@@ -101,4 +99,6 @@ driver cache, `LicenseStore`, and the key resolver so subsequent calls pick up t
 Transport settings (`timeout`, `verify_tls`, `retries`, `retry_delay`) may also be overridden
 per-driver inside that driver's config block.
 
-[← Docs index](../README.md#documentation)
+---
+
+[← Docs index](../../README.md#documentation)
