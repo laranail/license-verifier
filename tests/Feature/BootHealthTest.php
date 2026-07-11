@@ -10,7 +10,7 @@ use Simtabi\Laranail\Package\Tools\Services\Boot\BootReport;
  * assertion — not a dev-only crash — is what catches a silently reduced boot in
  * CI. The report stores redacted names/criticality only (rules 11/15).
  */
-it('boots with no degraded package builders', function () {
+it('boots with no degraded package builders', function (): void {
     $report = app(BootReport::class);
 
     expect($report->isHealthy())->toBeTrue(
