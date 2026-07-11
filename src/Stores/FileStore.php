@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\Licence\Verifier\Stores;
 
 use Illuminate\Support\Facades\File;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Package\Tools\Support\Resilience\FailurePolicy;
 use Throwable;
 
 /**
@@ -41,7 +42,20 @@ final readonly class FileStore implements LicenseStore
 
         try {
             return json_decode((string) decrypt(File::get($file)), true);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            // A tolerated anomaly (failure-handling standard, rule 14): the file
+            // exists but won't decrypt (corruption, tampering, or a rotated app
+            // key). We honour the "no value" contract by returning null, but a
+            // present-yet-unreadable record is worth surfacing before it silently
+            // forces a re-fetch. Context is redacted (rule 15): the hashed record
+            // id and exception class only — never the ciphertext or decrypted data.
+            FailurePolicy::warn('license record could not be decrypted', [
+                'store' => 'file',
+                'record' => basename($file, '.json'),
+                'reason' => 'threw '.$e::class,
+                'decision' => 'treated as absent (returned null)',
+            ]);
+
             return null;
         }
     }

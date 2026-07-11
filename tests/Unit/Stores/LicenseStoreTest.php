@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Log;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
@@ -35,6 +36,25 @@ it('round-trips a license record', function (LicenseStore $store): void {
 
     expect($store->has('KEY-1'))->toBeFalse();
 })->with('stores');
+
+it('returns null and warns when a stored file record cannot be decrypted', function (): void {
+    Log::spy();
+
+    $dir = sys_get_temp_dir().'/lv-store-'.uniqid();
+    $store = new FileStore($dir);
+
+    $store->put('KEY-1', ['key' => 'KEY-1', 'status' => 'active']);
+
+    // Corrupt the record on disk: present, but no longer decryptable.
+    $file = $dir.'/records/'.hash('sha256', 'KEY-1').'.json';
+    file_put_contents($file, 'not-a-valid-ciphertext');
+
+    expect($store->get('KEY-1'))->toBeNull();
+
+    Log::shouldHaveReceived('warning')
+        ->withArgs(fn (string $message): bool => str_contains($message, 'could not be decrypted'))
+        ->once();
+});
 
 it('binds the database store from config', function (): void {
     config()->set('license-verifier.storage.driver', 'database');
