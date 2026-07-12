@@ -1,0 +1,123 @@
+{
+    "name": "laranail/license-verifier",
+    "description": "Headless, provider-agnostic Laravel license verification client \u2014 PASETO/Ed25519 offline verification, device fingerprinting, seats, grace periods, and pluggable drivers (license-kit, Envato, Keygen, Lemon Squeezy, Gumroad, Cryptolens, LicenseSpring, Freemius, EDD, WooCommerce, Paddle, unlock.sh, generic). CLI/TUI-first; web UI ships separately in laranail/license-verifier-ui.",
+    "keywords": [
+        "laravel",
+        "license",
+        "licensing",
+        "license-verification",
+        "paseto",
+        "ed25519",
+        "offline-licensing",
+        "laranail"
+    ],
+    "homepage": "https://opensource.simtabi.com/products/laranail/license-verifier",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simtabi LLC",
+            "email": "opensource@simtabi.com",
+            "homepage": "https://opensource.simtabi.com",
+            "role": "Organization"
+        },
+        {
+            "name": "Imani Manyara",
+            "email": "imani@simtabi.com",
+            "role": "Maintainer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/laranail/license-verifier/issues",
+        "source": "https://github.com/laranail/license-verifier",
+        "docs": "https://opensource.simtabi.com/documentation/laranail/license-verifier/"
+    },
+    "require": {
+        "php": "^8.4 || ^8.5",
+        "ext-sodium": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "illuminate/contracts": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/console": "^13.0",
+        "guzzlehttp/guzzle": "^7.8",
+        "paragonie/paseto": "^3.5",
+        "laranail/package-tools": "^0.1"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.8",
+        "orchestra/testbench": "^10.6 || ^11.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-arch": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "rector/rector": "^2.0",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Licence\\Verifier\\": "src/",
+            "Simtabi\\Laranail\\Licence\\Verifier\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Licence\\Verifier\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest --colors=always",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "lint": [
+            "@pint",
+            "@analyse",
+            "@rector"
+        ],
+        "pint": "vendor/bin/pint --test",
+        "format": "vendor/bin/pint",
+        "rector": "vendor/bin/rector process --dry-run",
+        "rector-fix": "vendor/bin/rector process",
+        "audit": "@composer audit"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Simtabi\\Laranail\\Licence\\Verifier\\Providers\\LicenceVerifierServiceProvider"
+            ],
+            "aliases": {
+                "LicenseVerifier": "Simtabi\\Laranail\\Licence\\Verifier\\Facades\\LicenceVerifier"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/console"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/package-tools"
+        }
+    ]
+}
