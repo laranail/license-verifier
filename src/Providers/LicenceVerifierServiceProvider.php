@@ -65,7 +65,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
             ->name('laranail/license-verifier')
             ->hasConfigFile('license-verifier')
             ->withoutConfigNamespacing()
-            ->hasTranslations('license-verifier')
+            ->hasTranslations('laranail-license-verifier')
             ->hasMigration('create_license_verifier_table')
             ->hasCommands(
                 ActivateLicenseCommand::class,
@@ -201,8 +201,8 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
     #[Override]
     public function packageBooted(): void
     {
-        // (Short `license-verifier::` translation namespace is now registered by
-        // ->hasTranslations('license-verifier') in configurePackage.)
+        // (Short `laranail-license-verifier::` translation namespace is now registered by
+        // ->hasTranslations('laranail-license-verifier') in configurePackage.)
         $this->registerApiRoutes();
         $this->applyMiddlewareGroups();
         $this->scheduleHeartbeat();
