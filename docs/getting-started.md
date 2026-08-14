@@ -53,7 +53,7 @@ result within the grace window instead of taking your app down.
 Attach the `license` middleware alias (configurable redirect/abort, excluded routes):
 
 ```php
-Route::middleware('license')->group(function () {
+Route::middleware('laranail-license-verifier')->group(function () {
     // licensed-only routes
 });
 ```

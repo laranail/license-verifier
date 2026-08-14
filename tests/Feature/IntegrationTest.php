@@ -196,7 +196,7 @@ it('can use middleware to protect routes', function (): void {
 
     LicenceVerifier::activate('MIDDLEWARE-TEST-KEY');
 
-    Route::middleware('license')->get('/protected', fn (): string => 'Protected content');
+    Route::middleware('laranail-license-verifier')->get('/protected', fn (): string => 'Protected content');
 
     $response = $this->get('/protected');
     $response->assertStatus(200);
@@ -217,7 +217,7 @@ it('blocks access when license is invalid via middleware', function (): void {
         ], 404),
     ]);
 
-    Route::middleware('license')->get('/protected', fn (): string => 'Protected content');
+    Route::middleware('laranail-license-verifier')->get('/protected', fn (): string => 'Protected content');
 
     $response = $this->get('/protected');
     $response->assertStatus(403);
@@ -226,7 +226,7 @@ it('blocks access when license is invalid via middleware', function (): void {
 it('allows excluded routes without license check', function (): void {
     config(['license-verifier.excluded_routes' => ['public/*']]);
 
-    Route::middleware('license')->get('/public/page', fn (): string => 'Public content');
+    Route::middleware('laranail-license-verifier')->get('/public/page', fn (): string => 'Public content');
 
     $response = $this->get('/public/page');
     $response->assertStatus(200);

@@ -24,7 +24,7 @@ it('routes the facade through the active (non-PASETO) driver', function (): void
 it('gates middleware through the active driver', function (): void {
     config()->set('license-verifier.default', 'null');
 
-    Route::middleware('license')->get('/protected', fn (): string => 'ok');
+    Route::middleware('laranail-license-verifier')->get('/protected', fn (): string => 'ok');
 
     $this->get('/protected')->assertOk()->assertSee('ok');
 });

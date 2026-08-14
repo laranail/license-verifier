@@ -94,7 +94,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
                     ->field('Version', fn (): string => (string) InstalledVersions::getPrettyVersion('laranail/license-verifier'))
                     ->field('Driver', fn (): string => (string) config('license-verifier.driver', 'paseto'))
             )
-            ->registerRouteMiddleware('license', CheckLicense::class)
+            ->registerRouteMiddleware('laranail-license-verifier', CheckLicense::class)
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
                     ->publishConfigFile()
