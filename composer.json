@@ -42,7 +42,8 @@
         "illuminate/console": "^13.0",
         "guzzlehttp/guzzle": "^7.8",
         "paragonie/paseto": "^3.5",
-        "laranail/package-tools": "^0.1"
+        "laranail/package-tools": "^0.1",
+        "laranail/console": "^0.1"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",
