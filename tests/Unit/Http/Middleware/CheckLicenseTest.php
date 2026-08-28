@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 function middlewareWith(LicenseManager $manager): CheckLicense
 {
@@ -89,7 +89,7 @@ it('skips excluded routes without verifying', function (): void {
 it('flags an expiring-soon license in request attributes', function (): void {
     $manager = Mockery::mock(LicenseManager::class);
     $manager->shouldReceive('verify')->andReturn(
-        VerificationResult::valid(expiresAt: now()->addDays(3)->toIso8601String())
+        VerificationResult::valid(expiresAt: now()->addDays(3)->toIso8601String()),
     );
     $manager->shouldReceive('heartbeat')->andReturnTrue();
 

@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier;
 
+use Throwable;
 use Carbon\Carbon;
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\Drivers\Concerns\DispatchesLicenseEvents;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
 use Simtabi\Laranail\Licence\Verifier\Drivers\PasetoDriver;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\UnsupportedByDriverException;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
+use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
-use Throwable;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\UnsupportedByDriverException;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Drivers\Concerns\DispatchesLicenseEvents;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 
 /**
  * The single, driver-agnostic entry point for license operations. The facade,
@@ -54,6 +54,28 @@ class LicenseManager
         private readonly DriverManager $drivers,
         private readonly DomainBinding $domain,
     ) {}
+
+    /**
+     * Forward engine-only PASETO helpers (isInGracePeriod, isExpiringSoon,
+     * requiresOnlineRefresh, startGracePeriod, clearAll, validate, …) to the
+     * active driver, falling back to the PASETO engine where applicable.
+     *
+     * @param array<int, mixed> $parameters
+     */
+    public function __call(string $method, array $parameters): mixed
+    {
+        $driver = $this->activeDriver();
+
+        if (method_exists($driver, $method)) {
+            return $this->forwardCallTo($driver, $method, $parameters);
+        }
+
+        if ($driver instanceof PasetoDriver && method_exists($driver->engine(), $method)) {
+            return $this->forwardCallTo($driver->engine(), $method, $parameters);
+        }
+
+        throw UnsupportedByDriverException::capability($driver->name(), $method);
+    }
 
     /**
      * The currently active driver — the runtime-scoped one if set, else the
@@ -83,7 +105,7 @@ class LicenseManager
      * the change takes effect immediately — e.g.
      * LicenseVerifier::configure(['default' => 'gumroad', 'drivers.gumroad.product_id' => 'x']).
      *
-     * @param  array<string, mixed>  $overrides  dotted keys relative to `license-verifier.`
+     * @param array<string, mixed> $overrides dotted keys relative to `license-verifier.`
      */
     public function configure(array $overrides): static
     {
@@ -106,11 +128,6 @@ class LicenseManager
         app()->forgetInstance(LicenseKeyResolver::class);
 
         return $this;
-    }
-
-    private function resolvedDriverName(): string
-    {
-        return $this->scopedDriver ?? $this->drivers->getDefaultDriver();
     }
 
     public function activate(string|LicenseRequest $request, ?string $client = null): VerificationResult
@@ -150,32 +167,12 @@ class LicenseManager
     }
 
     /**
-     * Append-only activation audit (opt-in via `license-verifier.audit`). Records
-     * provenance — never the raw key/secret — to the configured log channel.
-     */
-    private function audit(string $key, VerificationResult $result): void
-    {
-        if (! (bool) config('license-verifier.audit.enabled', false)) {
-            return;
-        }
-
-        Log::channel(config('license-verifier.audit.channel'))->info('license.activation', [
-            'key_hash' => substr(hash('sha256', $key), 0, 16),
-            'driver' => $this->resolvedDriverName(),
-            'status' => $result->status->value,
-            'valid' => $result->valid,
-            'licensed_to' => $result->licensedTo,
-            'at' => Carbon::now()->toIso8601String(),
-        ]);
-    }
-
-    /**
      * Multi-source activation: try each driver in order and keep the first usable
      * result (for products sold through several channels). On success the winning
      * driver becomes the default so verify/deactivate target it. With no `$sources`
      * (and none configured) this is just {@see activate()} on the default driver.
      *
-     * @param  list<string>|null  $sources  driver names; defaults to config('license-verifier.sources')
+     * @param list<string>|null $sources driver names; defaults to config('license-verifier.sources')
      */
     public function activateAcross(string|LicenseRequest $request, ?array $sources = null, ?string $client = null): VerificationResult
     {
@@ -202,32 +199,6 @@ class LicenseManager
         return $last;
     }
 
-    /**
-     * Per-key activation rate limiting (opt-in via `license-verifier.rate_limit`).
-     * Returns an invalid result when the limit is exceeded, otherwise records a hit.
-     */
-    private function throttle(string $key): ?VerificationResult
-    {
-        if (! (bool) config('license-verifier.rate_limit.enabled', false)) {
-            return null;
-        }
-
-        $limiter = app(RateLimiter::class);
-        $bucket = 'license-verifier:activate:'.sha1($key);
-        $max = (int) config('license-verifier.rate_limit.max_attempts', 5);
-
-        if ($limiter->tooManyAttempts($bucket, $max)) {
-            return VerificationResult::invalid(
-                LicenseStatus::Unreachable,
-                message: "Too many activation attempts. Try again in {$limiter->availableIn($bucket)} seconds.",
-            );
-        }
-
-        $limiter->hit($bucket, (int) config('license-verifier.rate_limit.decay_seconds', 300));
-
-        return null;
-    }
-
     public function verify(?string $key = null): VerificationResult
     {
         $result = $this->resolveVerification($key);
@@ -239,185 +210,6 @@ class LicenseManager
         $this->announceTransition($key, $result);
 
         return $result;
-    }
-
-    /**
-     * Fire once-per-transition events (grace entered, revoked) by tracking the
-     * last-announced status for the key, so a repeated verify() does not spam.
-     */
-    private function announceTransition(?string $key, VerificationResult $result): void
-    {
-        if (! (bool) config('license-verifier.events.enabled', true)) {
-            return;
-        }
-
-        $cacheKey = $this->cacheKey($key).':status';
-        $previous = $this->cache()->get($cacheKey);
-        $current = $result->status->value;
-
-        if ($previous === $current) {
-            return;
-        }
-
-        match ($result->status) {
-            LicenseStatus::Grace => $this->eventGraceStarted($key, $result->licensedTo),
-            LicenseStatus::Revoked => $this->eventRevoked($key, $result->licensedTo),
-            default => null,
-        };
-
-        $this->cache()->put($cacheKey, $current, now()->addDays(30));
-    }
-
-    /**
-     * Resolve a verification result with resilience:
-     *  - return a fresh cached result without hitting the network;
-     *  - on success, cache it and remember the last-good time;
-     *  - when the source is unreachable, serve the cached result as Grace within
-     *    the grace window (fail-open) and fail-closed afterwards;
-     *  - enforce domain binding on every path.
-     */
-    protected function resolveVerification(?string $key): VerificationResult
-    {
-        $cacheEnabled = (bool) config('license-verifier.cache.enabled', true);
-        $entry = $cacheEnabled ? $this->cachedEntry($key) : null;
-
-        if ($entry !== null && $this->isFresh($entry)) {
-            return $this->withDomainBinding($entry['result']);
-        }
-
-        try {
-            $result = $this->activeDriver()->verify($key);
-        } catch (Throwable $e) {
-            return $this->withDomainBinding($this->graceOrFail($entry, $e));
-        }
-
-        if ($result->status === LicenseStatus::Unreachable) {
-            return $this->withDomainBinding($this->graceOrFail($entry, null));
-        }
-
-        if ($cacheEnabled && $result->isUsable()) {
-            $this->storeEntry($key, $result);
-        }
-
-        return $this->withDomainBinding($result);
-    }
-
-    /**
-     * Apply domain binding: when enabled and the current host is not allowed,
-     * a usable result is downgraded to Invalid.
-     */
-    private function withDomainBinding(VerificationResult $result): VerificationResult
-    {
-        if (! $result->isUsable() || ! $this->domain->enabled()) {
-            return $result;
-        }
-
-        $driver = $this->activeDriver();
-        $allowed = $driver instanceof SupportsDomainBinding
-            ? $this->hostAllowedByDriver($driver)
-            : $this->domain->passes();
-
-        if ($allowed) {
-            return $result;
-        }
-
-        return VerificationResult::invalid(
-            LicenseStatus::Invalid,
-            message: 'This license is not authorized for the current domain.',
-            raw: $result->raw,
-        );
-    }
-
-    private function hostAllowedByDriver(SupportsDomainBinding $driver): bool
-    {
-        $host = $this->domain->currentHost();
-        $bound = array_map(strtolower(...), $driver->boundDomains());
-
-        return $bound === [] || ($host !== null && in_array($host, $bound, true));
-    }
-
-    /**
-     * @param  array{result: VerificationResult, at: int}|null  $entry
-     */
-    private function graceOrFail(?array $entry, ?Throwable $e): VerificationResult
-    {
-        $failOpen = (bool) config('license-verifier.security.fail_open_in_grace', true);
-        $graceDays = (int) config('license-verifier.grace_period_days', 7);
-
-        if ($failOpen && $entry !== null && $this->withinGrace($entry, $graceDays)) {
-            return VerificationResult::valid(
-                status: LicenseStatus::Grace,
-                licensedTo: $entry['result']->licensedTo,
-                expiresAt: $entry['result']->expiresAt,
-                raw: $entry['result']->raw,
-            );
-        }
-
-        return VerificationResult::invalid(
-            LicenseStatus::Unreachable,
-            message: $e instanceof LicensingException ? $e->getMessage() : 'The license server is unreachable.',
-        );
-    }
-
-    /**
-     * @return array{result: VerificationResult, at: int}|null
-     */
-    private function cachedEntry(?string $key): ?array
-    {
-        $entry = $this->cache()->get($this->cacheKey($key));
-
-        return is_array($entry) && ($entry['result'] ?? null) instanceof VerificationResult ? $entry : null;
-    }
-
-    private function forgetCache(?string $key): void
-    {
-        if ((bool) config('license-verifier.cache.enabled', true)) {
-            $this->cache()->forget($this->cacheKey($key));
-        }
-    }
-
-    private function storeEntry(?string $key, VerificationResult $result): void
-    {
-        $graceDays = (int) config('license-verifier.grace_period_days', 7);
-
-        $this->cache()->put(
-            $this->cacheKey($key),
-            ['result' => $result, 'at' => now()->getTimestamp()],
-            Carbon::now()->addDays(max(1, $graceDays)),
-        );
-    }
-
-    /**
-     * @param  array{result: VerificationResult, at: int}  $entry
-     */
-    private function isFresh(array $entry): bool
-    {
-        $ttl = (int) config('license-verifier.cache.ttl', 3600);
-
-        return (now()->getTimestamp() - $entry['at']) < $ttl;
-    }
-
-    /**
-     * @param  array{result: VerificationResult, at: int}  $entry
-     */
-    private function withinGrace(array $entry, int $graceDays): bool
-    {
-        return (now()->getTimestamp() - $entry['at']) <= $graceDays * 86400;
-    }
-
-    private function cache(): Repository
-    {
-        return Cache::store(config('license-verifier.cache.store'));
-    }
-
-    private function cacheKey(?string $key): string
-    {
-        // Normalize null/empty to the configured license key so verify(null) and a
-        // keyed activate/deactivate(forgetCache) resolve to the SAME cache entry.
-        $key = $key !== null && $key !== '' ? $key : (string) config('license-verifier.license_key', '');
-        $prefix = (string) config('license-verifier.cache.key_prefix', 'license-verifier');
-
-        return $prefix.':verify:'.$this->resolvedDriverName().':'.hash('sha256', $key);
     }
 
     public function isValid(?string $key = null): bool
@@ -594,24 +386,232 @@ class LicenseManager
     }
 
     /**
-     * Forward engine-only PASETO helpers (isInGracePeriod, isExpiringSoon,
-     * requiresOnlineRefresh, startGracePeriod, clearAll, validate, …) to the
-     * active driver, falling back to the PASETO engine where applicable.
-     *
-     * @param  array<int, mixed>  $parameters
+     * Resolve a verification result with resilience:
+     *  - return a fresh cached result without hitting the network;
+     *  - on success, cache it and remember the last-good time;
+     *  - when the source is unreachable, serve the cached result as Grace within
+     *    the grace window (fail-open) and fail-closed afterwards;
+     *  - enforce domain binding on every path.
      */
-    public function __call(string $method, array $parameters): mixed
+    protected function resolveVerification(?string $key): VerificationResult
     {
+        $cacheEnabled = (bool) config('license-verifier.cache.enabled', true);
+        $entry = $cacheEnabled ? $this->cachedEntry($key) : null;
+
+        if ($entry !== null && $this->isFresh($entry)) {
+            return $this->withDomainBinding($entry['result']);
+        }
+
+        try {
+            $result = $this->activeDriver()->verify($key);
+        } catch (Throwable $e) {
+            return $this->withDomainBinding($this->graceOrFail($entry, $e));
+        }
+
+        if ($result->status === LicenseStatus::Unreachable) {
+            return $this->withDomainBinding($this->graceOrFail($entry, null));
+        }
+
+        if ($cacheEnabled && $result->isUsable()) {
+            $this->storeEntry($key, $result);
+        }
+
+        return $this->withDomainBinding($result);
+    }
+
+    private function resolvedDriverName(): string
+    {
+        return $this->scopedDriver ?? $this->drivers->getDefaultDriver();
+    }
+
+    /**
+     * Append-only activation audit (opt-in via `license-verifier.audit`). Records
+     * provenance — never the raw key/secret — to the configured log channel.
+     */
+    private function audit(string $key, VerificationResult $result): void
+    {
+        if (! (bool) config('license-verifier.audit.enabled', false)) {
+            return;
+        }
+
+        Log::channel(config('license-verifier.audit.channel'))->info('license.activation', [
+            'key_hash'    => substr(hash('sha256', $key), 0, 16),
+            'driver'      => $this->resolvedDriverName(),
+            'status'      => $result->status->value,
+            'valid'       => $result->valid,
+            'licensed_to' => $result->licensedTo,
+            'at'          => Carbon::now()->toIso8601String(),
+        ]);
+    }
+
+    /**
+     * Per-key activation rate limiting (opt-in via `license-verifier.rate_limit`).
+     * Returns an invalid result when the limit is exceeded, otherwise records a hit.
+     */
+    private function throttle(string $key): ?VerificationResult
+    {
+        if (! (bool) config('license-verifier.rate_limit.enabled', false)) {
+            return null;
+        }
+
+        $limiter = app(RateLimiter::class);
+        $bucket = 'license-verifier:activate:' . sha1($key);
+        $max = (int) config('license-verifier.rate_limit.max_attempts', 5);
+
+        if ($limiter->tooManyAttempts($bucket, $max)) {
+            return VerificationResult::invalid(
+                LicenseStatus::Unreachable,
+                message: "Too many activation attempts. Try again in {$limiter->availableIn($bucket)} seconds.",
+            );
+        }
+
+        $limiter->hit($bucket, (int) config('license-verifier.rate_limit.decay_seconds', 300));
+
+        return null;
+    }
+
+    /**
+     * Fire once-per-transition events (grace entered, revoked) by tracking the
+     * last-announced status for the key, so a repeated verify() does not spam.
+     */
+    private function announceTransition(?string $key, VerificationResult $result): void
+    {
+        if (! (bool) config('license-verifier.events.enabled', true)) {
+            return;
+        }
+
+        $cacheKey = $this->cacheKey($key) . ':status';
+        $previous = $this->cache()->get($cacheKey);
+        $current = $result->status->value;
+
+        if ($previous === $current) {
+            return;
+        }
+
+        match ($result->status) {
+            LicenseStatus::Grace   => $this->eventGraceStarted($key, $result->licensedTo),
+            LicenseStatus::Revoked => $this->eventRevoked($key, $result->licensedTo),
+            default                => null,
+        };
+
+        $this->cache()->put($cacheKey, $current, now()->addDays(30));
+    }
+
+    /**
+     * Apply domain binding: when enabled and the current host is not allowed,
+     * a usable result is downgraded to Invalid.
+     */
+    private function withDomainBinding(VerificationResult $result): VerificationResult
+    {
+        if (! $result->isUsable() || ! $this->domain->enabled()) {
+            return $result;
+        }
+
         $driver = $this->activeDriver();
+        $allowed = $driver instanceof SupportsDomainBinding
+            ? $this->hostAllowedByDriver($driver)
+            : $this->domain->passes();
 
-        if (method_exists($driver, $method)) {
-            return $this->forwardCallTo($driver, $method, $parameters);
+        if ($allowed) {
+            return $result;
         }
 
-        if ($driver instanceof PasetoDriver && method_exists($driver->engine(), $method)) {
-            return $this->forwardCallTo($driver->engine(), $method, $parameters);
+        return VerificationResult::invalid(
+            LicenseStatus::Invalid,
+            message: 'This license is not authorized for the current domain.',
+            raw: $result->raw,
+        );
+    }
+
+    private function hostAllowedByDriver(SupportsDomainBinding $driver): bool
+    {
+        $host = $this->domain->currentHost();
+        $bound = array_map(strtolower(...), $driver->boundDomains());
+
+        return $bound === [] || ($host !== null && in_array($host, $bound, true));
+    }
+
+    /**
+     * @param array{result: VerificationResult, at: int}|null $entry
+     */
+    private function graceOrFail(?array $entry, ?Throwable $e): VerificationResult
+    {
+        $failOpen = (bool) config('license-verifier.security.fail_open_in_grace', true);
+        $graceDays = (int) config('license-verifier.grace_period_days', 7);
+
+        if ($failOpen && $entry !== null && $this->withinGrace($entry, $graceDays)) {
+            return VerificationResult::valid(
+                status: LicenseStatus::Grace,
+                licensedTo: $entry['result']->licensedTo,
+                expiresAt: $entry['result']->expiresAt,
+                raw: $entry['result']->raw,
+            );
         }
 
-        throw UnsupportedByDriverException::capability($driver->name(), $method);
+        return VerificationResult::invalid(
+            LicenseStatus::Unreachable,
+            message: $e instanceof LicensingException ? $e->getMessage() : 'The license server is unreachable.',
+        );
+    }
+
+    /**
+     * @return array{result: VerificationResult, at: int}|null
+     */
+    private function cachedEntry(?string $key): ?array
+    {
+        $entry = $this->cache()->get($this->cacheKey($key));
+
+        return is_array($entry) && ($entry['result'] ?? null) instanceof VerificationResult ? $entry : null;
+    }
+
+    private function forgetCache(?string $key): void
+    {
+        if ((bool) config('license-verifier.cache.enabled', true)) {
+            $this->cache()->forget($this->cacheKey($key));
+        }
+    }
+
+    private function storeEntry(?string $key, VerificationResult $result): void
+    {
+        $graceDays = (int) config('license-verifier.grace_period_days', 7);
+
+        $this->cache()->put(
+            $this->cacheKey($key),
+            ['result' => $result, 'at' => now()->getTimestamp()],
+            Carbon::now()->addDays(max(1, $graceDays)),
+        );
+    }
+
+    /**
+     * @param array{result: VerificationResult, at: int} $entry
+     */
+    private function isFresh(array $entry): bool
+    {
+        $ttl = (int) config('license-verifier.cache.ttl', 3600);
+
+        return (now()->getTimestamp() - $entry['at']) < $ttl;
+    }
+
+    /**
+     * @param array{result: VerificationResult, at: int} $entry
+     */
+    private function withinGrace(array $entry, int $graceDays): bool
+    {
+        return (now()->getTimestamp() - $entry['at']) <= $graceDays * 86400;
+    }
+
+    private function cache(): Repository
+    {
+        return Cache::store(config('license-verifier.cache.store'));
+    }
+
+    private function cacheKey(?string $key): string
+    {
+        // Normalize null/empty to the configured license key so verify(null) and a
+        // keyed activate/deactivate(forgetCache) resolve to the SAME cache entry.
+        $key = $key !== null && $key !== '' ? $key : (string) config('license-verifier.license_key', '');
+        $prefix = (string) config('license-verifier.cache.key_prefix', 'license-verifier');
+
+        return $prefix . ':verify:' . $this->resolvedDriverName() . ':' . hash('sha256', $key);
     }
 }

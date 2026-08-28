@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\Capability;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 
 /**
  * The default driver: a thin adapter over the PASETO/Ed25519 engine
@@ -50,33 +50,6 @@ final readonly class PasetoDriver implements Driver, SupportsEntitlements, Suppo
         return $this->engine->deactivate($key, $reason);
     }
 
-    /**
-     * Build the verification result. An optional client (buyer) name supplied at
-     * activation is surfaced as licensedTo when the token carries none.
-     */
-    private function resultFor(?string $key, ?string $client = null): VerificationResult
-    {
-        $info = LicenseInfo::fromArray($this->engine->getLicenseInfo($key));
-
-        if ($this->engine->isValid($key)) {
-            return VerificationResult::valid(
-                status: LicenseStatus::Valid,
-                licensedTo: $info->licensedTo ?? $client,
-                activatedAt: $info->activatedAt,
-                expiresAt: $info->expiresAt,
-                raw: $info->raw,
-            );
-        }
-
-        if ($this->engine->isInGracePeriod()) {
-            return VerificationResult::valid(status: LicenseStatus::Grace, raw: $info->raw);
-        }
-
-        $status = $info->raw === [] ? LicenseStatus::Unactivated : LicenseStatus::Invalid;
-
-        return VerificationResult::invalid($status, raw: $info->raw);
-    }
-
     public function getLicenseInfo(?string $key = null): LicenseInfo
     {
         return LicenseInfo::fromArray($this->engine->getLicenseInfo($key));
@@ -91,10 +64,10 @@ final readonly class PasetoDriver implements Driver, SupportsEntitlements, Suppo
     {
         return [
             [
-                'name' => 'license_key',
-                'label' => 'License key',
-                'type' => 'text',
-                'required' => true,
+                'name'        => 'license_key',
+                'label'       => 'License key',
+                'type'        => 'text',
+                'required'    => true,
                 'placeholder' => 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
             ],
         ];
@@ -186,5 +159,32 @@ final readonly class PasetoDriver implements Driver, SupportsEntitlements, Suppo
     public function engine(): LicenceVerifier
     {
         return $this->engine;
+    }
+
+    /**
+     * Build the verification result. An optional client (buyer) name supplied at
+     * activation is surfaced as licensedTo when the token carries none.
+     */
+    private function resultFor(?string $key, ?string $client = null): VerificationResult
+    {
+        $info = LicenseInfo::fromArray($this->engine->getLicenseInfo($key));
+
+        if ($this->engine->isValid($key)) {
+            return VerificationResult::valid(
+                status: LicenseStatus::Valid,
+                licensedTo: $info->licensedTo ?? $client,
+                activatedAt: $info->activatedAt,
+                expiresAt: $info->expiresAt,
+                raw: $info->raw,
+            );
+        }
+
+        if ($this->engine->isInGracePeriod()) {
+            return VerificationResult::valid(status: LicenseStatus::Grace, raw: $info->raw);
+        }
+
+        $status = $info->raw === [] ? LicenseStatus::Unactivated : LicenseStatus::Invalid;
+
+        return VerificationResult::invalid($status, raw: $info->raw);
     }
 }

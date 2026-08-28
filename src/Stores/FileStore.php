@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Stores;
 
+use Throwable;
 use Illuminate\Support\Facades\File;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Package\Tools\Support\Resilience\FailurePolicy;
-use Throwable;
 
 /**
  * Stores license records as encrypted JSON files under the configured path.
@@ -18,7 +18,7 @@ final readonly class FileStore implements LicenseStore
 
     public function __construct(?string $path = null)
     {
-        $this->path = rtrim((string) ($path ?? config('license-verifier.storage.path', storage_path('app/licensing'))), '/').'/records';
+        $this->path = rtrim((string) ($path ?? config('license-verifier.storage.path', storage_path('app/licensing'))), '/') . '/records';
 
         if (! File::isDirectory($this->path)) {
             File::makeDirectory($this->path, 0700, true);
@@ -50,9 +50,9 @@ final readonly class FileStore implements LicenseStore
             // forces a re-fetch. Context is redacted (rule 15): the hashed record
             // id and exception class only — never the ciphertext or decrypted data.
             FailurePolicy::warn('license record could not be decrypted', [
-                'store' => 'file',
-                'record' => basename($file, '.json'),
-                'reason' => 'threw '.$e::class,
+                'store'    => 'file',
+                'record'   => basename($file, '.json'),
+                'reason'   => 'threw ' . $e::class,
                 'decision' => 'treated as absent (returned null)',
             ]);
 
@@ -76,6 +76,6 @@ final readonly class FileStore implements LicenseStore
 
     private function filename(string $key): string
     {
-        return $this->path.'/'.hash('sha256', $key).'.json';
+        return $this->path . '/' . hash('sha256', $key) . '.json';
     }
 }

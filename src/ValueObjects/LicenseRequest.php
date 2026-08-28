@@ -10,8 +10,8 @@ namespace Simtabi\Laranail\Licence\Verifier\ValueObjects;
 final readonly class LicenseRequest
 {
     /**
-     * @param  array<string, mixed>  $metadata
-     * @param  array<string, mixed>  $extra
+     * @param array<string, mixed> $metadata
+     * @param array<string, mixed> $extra
      */
     public function __construct(
         public string $key,
@@ -22,7 +22,7 @@ final readonly class LicenseRequest
     ) {}
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     public static function fromArray(array $data): self
     {

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Services;
 
-use Carbon\Carbon;
 use Exception;
-use ParagonIE\Paseto\Keys\Base\AsymmetricPublicKey;
+use Throwable;
+use Carbon\Carbon;
 use ParagonIE\Paseto\Parser;
+use ParagonIE\Paseto\Rules\IssuedBy;
 use ParagonIE\Paseto\Protocol\Version4;
 use ParagonIE\Paseto\ProtocolCollection;
-use ParagonIE\Paseto\Rules\IssuedBy;
+use ParagonIE\Paseto\Keys\Base\AsymmetricPublicKey;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Throwable;
 
 class TokenValidator
 {
@@ -23,7 +23,7 @@ class TokenValidator
     protected Parser $parser;
 
     public function __construct(
-        protected FingerprintGenerator $fingerprintGenerator
+        protected FingerprintGenerator $fingerprintGenerator,
     ) {
         $this->initializeParser();
     }
@@ -164,25 +164,47 @@ class TokenValidator
             $claims = $this->validate($token);
 
             return [
-                'license_id' => $claims['license_id'] ?? null,
-                'license_key_hash' => $claims['license_key_hash'] ?? null,
-                'status' => $claims['status'] ?? null,
-                'max_usages' => $claims['max_usages'] ?? null,
-                'expires_at' => $claims['exp'] ?? null,
-                'issued_at' => $claims['iat'] ?? null,
-                'not_before' => $claims['nbf'] ?? null,
-                'issuer' => $claims['iss'] ?? null,
+                'license_id'         => $claims['license_id'] ?? null,
+                'license_key_hash'   => $claims['license_key_hash'] ?? null,
+                'status'             => $claims['status'] ?? null,
+                'max_usages'         => $claims['max_usages'] ?? null,
+                'expires_at'         => $claims['exp'] ?? null,
+                'issued_at'          => $claims['iat'] ?? null,
+                'not_before'         => $claims['nbf'] ?? null,
+                'issuer'             => $claims['iss'] ?? null,
                 'license_expires_at' => $claims['license_expires_at'] ?? null,
                 'force_online_after' => $claims['force_online_after'] ?? null,
-                'grace_until' => $claims['grace_until'] ?? null,
-                'usage_fingerprint' => $claims['usage_fingerprint'] ?? null,
-                'licensable_type' => $claims['licensable_type'] ?? null,
-                'licensable_id' => $claims['licensable_id'] ?? null,
-                'entitlements' => $claims['entitlements'] ?? null,
+                'grace_until'        => $claims['grace_until'] ?? null,
+                'usage_fingerprint'  => $claims['usage_fingerprint'] ?? null,
+                'licensable_type'    => $claims['licensable_type'] ?? null,
+                'licensable_id'      => $claims['licensable_id'] ?? null,
+                'entitlements'       => $claims['entitlements'] ?? null,
             ];
         } catch (Exception) {
             return [];
         }
+    }
+
+    /**
+     * Update the public key used for token validation (for key rotation)
+     */
+    public function updatePublicKey(string $publicKeyString): void
+    {
+        try {
+            $this->publicKey = AsymmetricPublicKey::fromEncodedString($publicKeyString, new Version4);
+            $this->parser = Parser::getPublic($this->publicKey, ProtocolCollection::v4());
+            $this->configureParser();
+        } catch (Exception) {
+            throw LicensingException::invalidConfiguration('Invalid public key format');
+        }
+    }
+
+    /**
+     * Set the root public key for certificate chain verification
+     */
+    public function setRootPublicKey(string $rootPublicKey): void
+    {
+        $this->rootPublicKey = $rootPublicKey;
     }
 
     /**
@@ -206,20 +228,6 @@ class TokenValidator
     }
 
     /**
-     * Update the public key used for token validation (for key rotation)
-     */
-    public function updatePublicKey(string $publicKeyString): void
-    {
-        try {
-            $this->publicKey = AsymmetricPublicKey::fromEncodedString($publicKeyString, new Version4);
-            $this->parser = Parser::getPublic($this->publicKey, ProtocolCollection::v4());
-            $this->configureParser();
-        } catch (Exception) {
-            throw LicensingException::invalidConfiguration('Invalid public key format');
-        }
-    }
-
-    /**
      * Configure parser rules (issuer validation, etc.)
      */
     protected function configureParser(): void
@@ -232,14 +240,6 @@ class TokenValidator
         if ($issuer) {
             $this->parser->addRule(new IssuedBy($issuer));
         }
-    }
-
-    /**
-     * Set the root public key for certificate chain verification
-     */
-    public function setRootPublicKey(string $rootPublicKey): void
-    {
-        $this->rootPublicKey = $rootPublicKey;
     }
 
     /**
@@ -273,7 +273,8 @@ class TokenValidator
      * `PasetoTokenService::verifyOffline` so the rotating signing key advertised in
      * the footer is the one that actually verifies the token.
      *
-     * @param  array<string, mixed>  $chain
+     * @param array<string, mixed> $chain
+     *
      * @return array<string, mixed>
      */
     protected function verifyChainedToken(string $token, array $chain): array
@@ -284,7 +285,7 @@ class TokenValidator
 
         try {
             $signingKey = new \ParagonIE\Paseto\Keys\Version4\AsymmetricPublicKey(
-                base64_decode((string) ($chain['signing']['public_key'] ?? ''), true) ?: ''
+                base64_decode((string) ($chain['signing']['public_key'] ?? ''), true) ?: '',
             );
         } catch (Throwable) {
             throw LicensingException::invalidCertificateChain();
@@ -305,7 +306,7 @@ class TokenValidator
     /**
      * Verify the certificate chain from the token footer against the stored root key
      *
-     * @param  array<string, mixed>  $footer
+     * @param array<string, mixed> $footer
      */
     protected function verifyCertificateChain(array $footer): bool
     {

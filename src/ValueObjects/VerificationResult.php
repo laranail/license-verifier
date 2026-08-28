@@ -10,7 +10,7 @@ namespace Simtabi\Laranail\Licence\Verifier\ValueObjects;
 final readonly class VerificationResult
 {
     /**
-     * @param  array<string, mixed>  $raw
+     * @param array<string, mixed> $raw
      */
     public function __construct(
         public LicenseStatus $status,
@@ -23,7 +23,7 @@ final readonly class VerificationResult
     ) {}
 
     /**
-     * @param  array<string, mixed>  $raw
+     * @param array<string, mixed> $raw
      */
     public static function valid(
         LicenseStatus $status = LicenseStatus::Valid,
@@ -37,7 +37,7 @@ final readonly class VerificationResult
     }
 
     /**
-     * @param  array<string, mixed>  $raw
+     * @param array<string, mixed> $raw
      */
     public static function invalid(
         LicenseStatus $status = LicenseStatus::Invalid,
@@ -58,12 +58,12 @@ final readonly class VerificationResult
     public function toArray(): array
     {
         return [
-            'status' => $this->status->value,
-            'valid' => $this->valid,
-            'message' => $this->message,
-            'licensed_to' => $this->licensedTo,
+            'status'       => $this->status->value,
+            'valid'        => $this->valid,
+            'message'      => $this->message,
+            'licensed_to'  => $this->licensedTo,
             'activated_at' => $this->activatedAt,
-            'expires_at' => $this->expiresAt,
+            'expires_at'   => $this->expiresAt,
         ];
     }
 }

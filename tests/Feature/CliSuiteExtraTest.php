@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Artisan;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 
 it('shows the configured source', function (): void {
@@ -53,7 +53,7 @@ it('exports and re-imports the offline token (air-gap round-trip)', function ():
     $storage = app(TokenStorage::class);
     $storage->store('THE-OFFLINE-TOKEN', 'OFFLINE-KEY');
 
-    $path = sys_get_temp_dir().'/lv-token-'.uniqid().'.token';
+    $path = sys_get_temp_dir() . '/lv-token-' . uniqid() . '.token';
 
     $this->artisan("license:token export {$path}")->assertSuccessful();
     expect(File::exists($path))->toBeTrue();

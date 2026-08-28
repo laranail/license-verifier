@@ -14,9 +14,9 @@ use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 final readonly class CallbackStore implements LicenseStore
 {
     /**
-     * @param  Closure(string, array<string, mixed>): void  $putUsing
-     * @param  Closure(string): (array<string, mixed>|null)  $getUsing
-     * @param  Closure(string): void  $forgetUsing
+     * @param Closure(string, array<string, mixed>): void $putUsing
+     * @param Closure(string): (array<string, mixed>|null) $getUsing
+     * @param Closure(string): void $forgetUsing
      */
     public function __construct(
         private Closure $putUsing,

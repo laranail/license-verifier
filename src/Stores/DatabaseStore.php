@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Stores;
 
 use Illuminate\Database\Eloquent\Model;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
 /**
  * Stores license records in the database via the configured Eloquent model

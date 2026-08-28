@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
-use Simtabi\Laranail\Licence\Verifier\Facades\LicenceVerifier;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
+use Simtabi\Laranail\Licence\Verifier\Facades\LicenceVerifier;
 
 it('can complete a full license lifecycle', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'token' => $this->generateTestToken([
                     'license_id' => 1,
-                    'status' => 'active',
+                    'status'     => 'active',
                     'max_usages' => 5,
                 ]),
-                'token_expires_at' => now()->addDays(7)->toIso8601String(),
-                'refresh_after' => now()->addDays(6)->toIso8601String(),
+                'token_expires_at'   => now()->addDays(7)->toIso8601String(),
+                'refresh_after'      => now()->addDays(6)->toIso8601String(),
                 'force_online_after' => now()->addDays(14)->toIso8601String(),
-                'license' => ['id' => 'ulid-1', 'status' => 'active', 'max_usages' => 5],
-                'usage' => ['id' => 1, 'fingerprint' => 'fp', 'status' => 'active'],
+                'license'            => ['id' => 'ulid-1', 'status' => 'active', 'max_usages' => 5],
+                'usage'              => ['id' => 1, 'fingerprint' => 'fp', 'status' => 'active'],
             ],
         ], 200),
 
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'token' => $this->generateTestToken([
                     'exp' => now()->addYear()->toIso8601String(),
                 ]),
@@ -37,19 +37,19 @@ it('can complete a full license lifecycle', function (): void {
 
         '*/api/licensing/v1/heartbeat' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'usage' => ['id' => 1, 'last_seen_at' => now()->toIso8601String()],
             ],
         ], 200),
 
         '*/api/licensing/v1/deactivate' => Http::response([
             'success' => true,
-            'data' => ['message' => 'Usage revoked successfully'],
+            'data'    => ['message' => 'Usage revoked successfully'],
         ], 200),
 
         '*/api/licensing/v1/health' => Http::response([
             'success' => true,
-            'data' => ['status' => 'healthy', 'checks' => ['database' => ['status' => 'ok']]],
+            'data'    => ['status' => 'healthy', 'checks' => ['database' => ['status' => 'ok']]],
         ], 200),
     ]);
 
@@ -89,7 +89,7 @@ it('can complete a full license lifecycle', function (): void {
 
 it('handles grace period when server is unreachable', function (): void {
     Http::fake([
-        '*/api/licensing/v1/*' => Http::response(null, 500),
+        '*/api/licensing/v1/*'      => Http::response(null, 500),
         '*/api/licensing/v1/health' => Http::response(null, 500),
     ]);
 
@@ -121,7 +121,7 @@ it('handles expired license correctly', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'token' => $expiredToken,
             ],
         ], 200),
@@ -143,7 +143,7 @@ it('detects when license is expiring soon', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'token' => $expiringToken,
             ],
         ], 200),
@@ -188,7 +188,7 @@ it('can use middleware to protect routes', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'token' => $this->generateTestToken(),
             ],
         ], 200),
@@ -209,11 +209,11 @@ it('blocks access when license is invalid via middleware', function (): void {
     Http::fake([
         '*/api/licensing/v1/health' => Http::response([
             'success' => true,
-            'data' => ['status' => 'healthy'],
+            'data'    => ['status' => 'healthy'],
         ], 200),
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => false,
-            'error' => ['code' => 'INVALID_KEY', 'message' => 'Invalid license'],
+            'error'   => ['code' => 'INVALID_KEY', 'message' => 'Invalid license'],
         ], 404),
     ]);
 

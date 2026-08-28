@@ -24,9 +24,9 @@ final class KeysCommand extends Command
         $bundle = $storage->getPublicKeyBundle() ?? [];
 
         $data = [
-            'public_key' => $this->fingerprint($public),
+            'public_key'         => $this->fingerprint($public),
             'bundle_signing_kid' => $bundle['signing']['kid'] ?? null,
-            'bundle_root_kid' => $bundle['root']['kid'] ?? null,
+            'bundle_root_kid'    => $bundle['root']['kid'] ?? null,
         ];
 
         if ($this->wantsJson()) {
@@ -36,9 +36,9 @@ final class KeysCommand extends Command
         }
 
         $this->services->display()->keyValue(array_filter([
-            'Public key' => $data['public_key'] ?: '(none configured)',
+            'Public key'  => $data['public_key'] ?: '(none configured)',
             'Signing kid' => $data['bundle_signing_kid'],
-            'Root kid' => $data['bundle_root_kid'],
+            'Root kid'    => $data['bundle_root_kid'],
         ]), 'Keys');
 
         return self::SUCCESS;

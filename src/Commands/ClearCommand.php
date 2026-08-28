@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Commands;
 
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
 final class ClearCommand extends Command
 {

@@ -28,6 +28,21 @@ class FingerprintGenerator
     }
 
     /**
+     * Get additional metadata about the device
+     */
+    public function getMetadata(): array
+    {
+        return [
+            'hostname'        => $this->getHostname(),
+            'os'              => PHP_OS_FAMILY,
+            'php_version'     => $this->getPhpVersion(),
+            'laravel_version' => $this->getLaravelVersion(),
+            'environment'     => App::environment(),
+            'timezone'        => config('app.timezone'),
+        ];
+    }
+
+    /**
      * Get the hostname
      */
     protected function getHostname(): string
@@ -121,20 +136,5 @@ class FingerprintGenerator
     protected function getAppKey(): string
     {
         return (string) config('app.key', 'no-app-key');
-    }
-
-    /**
-     * Get additional metadata about the device
-     */
-    public function getMetadata(): array
-    {
-        return [
-            'hostname' => $this->getHostname(),
-            'os' => PHP_OS_FAMILY,
-            'php_version' => $this->getPhpVersion(),
-            'laravel_version' => $this->getLaravelVersion(),
-            'environment' => App::environment(),
-            'timezone' => config('app.timezone'),
-        ];
     }
 }

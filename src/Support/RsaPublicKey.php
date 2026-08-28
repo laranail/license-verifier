@@ -36,12 +36,12 @@ final class RsaPublicKey
             return null;
         }
 
-        $rsaPublicKey = self::seq(self::int($modulus).self::int($exponent));
+        $rsaPublicKey = self::seq(self::int($modulus) . self::int($exponent));
         // AlgorithmIdentifier: SEQUENCE { OID 1.2.840.113549.1.1.1 (rsaEncryption), NULL }
         $algorithm = "\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00";
-        $spki = self::seq($algorithm.self::bitString($rsaPublicKey));
+        $spki = self::seq($algorithm . self::bitString($rsaPublicKey));
 
-        return "-----BEGIN PUBLIC KEY-----\n".chunk_split(base64_encode($spki), 64, "\n").'-----END PUBLIC KEY-----';
+        return "-----BEGIN PUBLIC KEY-----\n" . chunk_split(base64_encode($spki), 64, "\n") . '-----END PUBLIC KEY-----';
     }
 
     private static function len(int $length): string
@@ -52,11 +52,11 @@ final class RsaPublicKey
 
         $bytes = '';
         while ($length > 0) {
-            $bytes = chr($length & 0xFF).$bytes;
+            $bytes = chr($length & 0xFF) . $bytes;
             $length >>= 8;
         }
 
-        return chr(0x80 | strlen($bytes)).$bytes;
+        return chr(0x80 | strlen($bytes)) . $bytes;
     }
 
     private static function int(string $bytes): string
@@ -68,21 +68,21 @@ final class RsaPublicKey
         }
 
         if ((ord($bytes[0]) & 0x80) !== 0) {
-            $bytes = "\x00".$bytes; // keep it positive
+            $bytes = "\x00" . $bytes; // keep it positive
         }
 
-        return "\x02".self::len(strlen($bytes)).$bytes;
+        return "\x02" . self::len(strlen($bytes)) . $bytes;
     }
 
     private static function seq(string $content): string
     {
-        return "\x30".self::len(strlen($content)).$content;
+        return "\x30" . self::len(strlen($content)) . $content;
     }
 
     private static function bitString(string $content): string
     {
-        $content = "\x00".$content; // zero unused bits
+        $content = "\x00" . $content; // zero unused bits
 
-        return "\x03".self::len(strlen($content)).$content;
+        return "\x03" . self::len(strlen($content)) . $content;
     }
 }

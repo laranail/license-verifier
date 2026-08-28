@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 
 beforeEach(function (): void {
@@ -14,7 +14,7 @@ beforeEach(function (): void {
 it('tries sources in order and the first usable one wins', function (): void {
     Http::fake([
         'api.anystack.sh/*' => Http::response(['message' => 'invalid'], 404),
-        'api.whop.com/*' => Http::response(['status' => 'active', 'id' => 'mem_1', 'user' => ['username' => 'ada']]),
+        'api.whop.com/*'    => Http::response(['status' => 'active', 'id' => 'mem_1', 'user' => ['username' => 'ada']]),
     ]);
 
     $result = app(LicenseManager::class)->activateAcross('KEY-123', ['anystack', 'whop'], 'Ada');
@@ -27,7 +27,7 @@ it('tries sources in order and the first usable one wins', function (): void {
 it('returns the last failure when no source accepts the key', function (): void {
     Http::fake([
         'api.anystack.sh/*' => Http::response(['message' => 'nope'], 404),
-        'api.whop.com/*' => Http::response(['status' => 'expired']),
+        'api.whop.com/*'    => Http::response(['status' => 'expired']),
     ]);
 
     $result = app(LicenseManager::class)->activateAcross('BAD', ['anystack', 'whop']);
@@ -57,7 +57,7 @@ it('writes an audit entry (without the raw key) when auditing is enabled', funct
     Log::shouldReceive('info')->once()->withArgs(
         fn (string $message, array $context): bool => $message === 'license.activation'
             && isset($context['key_hash'])
-            && ! isset($context['key'])
+            && ! isset($context['key']),
     );
 
     app(LicenseManager::class)->activate('SECRET-KEY');

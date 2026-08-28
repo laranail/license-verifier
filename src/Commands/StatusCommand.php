@@ -36,10 +36,10 @@ final class StatusCommand extends Command
         $strict = (bool) $this->option('strict');
 
         return match (true) {
-            $result->status === LicenseStatus::Valid => self::SUCCESS,
-            $result->status === LicenseStatus::Grace => $strict ? self::FAILURE : self::SUCCESS,
+            $result->status === LicenseStatus::Valid       => self::SUCCESS,
+            $result->status === LicenseStatus::Grace       => $strict ? self::FAILURE : self::SUCCESS,
             $result->status === LicenseStatus::Unreachable => $strict ? 2 : self::SUCCESS,
-            default => self::FAILURE,
+            default                                        => self::FAILURE,
         };
     }
 }

@@ -13,7 +13,7 @@ interface LicenseStore
     /**
      * Persist (create or update) the record for a license key.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     public function put(string $key, array $data): void;
 

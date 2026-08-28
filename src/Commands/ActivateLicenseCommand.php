@@ -45,7 +45,7 @@ final class ActivateLicenseCommand extends Command
                             ['Licensed to', $info['licensed_to'] ?? '—'],
                             ['Expires', $info['expires_at'] ?? 'Never'],
                             ['Seats', $info['seats_total'] ?? 'Unlimited'],
-                        ]
+                        ],
                     );
                 }
 
@@ -56,7 +56,7 @@ final class ActivateLicenseCommand extends Command
 
             return self::FAILURE;
         } catch (Exception $e) {
-            $this->error('Activation failed: '.$e->getMessage());
+            $this->error('Activation failed: ' . $e->getMessage());
 
             return self::FAILURE;
         }
