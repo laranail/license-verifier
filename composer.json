@@ -87,7 +87,7 @@
         "format": "@pint-fix",
         "rector": "vendor/bin/rector process --dry-run",
         "rector-fix": "vendor/bin/rector process",
-        "audit": "@composer audit",
+        "composer-audit": "@composer audit",
         "pint-fix": "@php vendor/bin/laranail-pint --parallel"
     },
     "config": {
