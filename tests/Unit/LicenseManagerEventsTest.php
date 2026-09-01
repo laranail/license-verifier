@@ -3,27 +3,27 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Event;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
-use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
 use Simtabi\Laranail\Licence\Verifier\Events\GracePeriodStarted;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivated;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseHeartbeatSent;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 
 /**
  * Lifecycle events are dispatched centrally by the LicenseManager, so EVERY

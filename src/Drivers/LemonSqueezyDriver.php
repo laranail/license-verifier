@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -26,7 +26,7 @@ final class LemonSqueezyDriver extends AbstractHttpDriver
         $instanceName = $request->client ?? $request->fingerprint ?? gethostname() ?: 'instance';
 
         $response = $this->http()->asForm()->post('/v1/licenses/activate', [
-            'license_key'   => $request->key,
+            'license_key' => $request->key,
             'instance_name' => $instanceName,
         ]);
 
@@ -41,9 +41,9 @@ final class LemonSqueezyDriver extends AbstractHttpDriver
         }
 
         $this->remember($request->key, [
-            'status'     => $data['license_key']['status'] ?? 'active',
+            'status' => $data['license_key']['status'] ?? 'active',
             'expires_at' => $data['license_key']['expires_at'] ?? null,
-            'metadata'   => ['instance_id' => $data['instance']['id'] ?? null],
+            'metadata' => ['instance_id' => $data['instance']['id'] ?? null],
         ]);
 
         return $this->resultFromPayload($data);
@@ -96,7 +96,7 @@ final class LemonSqueezyDriver extends AbstractHttpDriver
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resultFromPayload(array $data): VerificationResult
     {

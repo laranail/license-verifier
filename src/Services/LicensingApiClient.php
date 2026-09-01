@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 
 class LicensingApiClient
@@ -35,7 +35,7 @@ class LicensingApiClient
                 ->post($this->getEndpoint('activate'), [
                     'license_key' => $licenseKey,
                     'fingerprint' => $fingerprint,
-                    'metadata'    => $metadata,
+                    'metadata' => $metadata,
                 ]);
 
             $response->throw();
@@ -108,7 +108,7 @@ class LicensingApiClient
                 ->post($this->getEndpoint('heartbeat'), [
                     'license_key' => $licenseKey,
                     'fingerprint' => $fingerprint,
-                    'data'        => $data,
+                    'data' => $data,
                 ]);
 
             $response->throw();
@@ -199,7 +199,7 @@ class LicensingApiClient
                 ->post($this->getEndpoint('usages/revoke'), [
                     'license_key' => $licenseKey,
                     'fingerprint' => $fingerprint,
-                    'target'      => $target,
+                    'target' => $target,
                 ]);
 
             $response->throw();
@@ -236,7 +236,7 @@ class LicensingApiClient
      */
     protected function getEndpoint(string $path): string
     {
-        return "/api/licensing/{$this->apiVersion}/" . ltrim($path, '/');
+        return "/api/licensing/{$this->apiVersion}/".ltrim($path, '/');
     }
 
     /**
@@ -247,7 +247,7 @@ class LicensingApiClient
         $request = Http::baseUrl($this->baseUrl)
             ->timeout($this->timeout)
             ->withHeaders([
-                'Accept'       => 'application/json',
+                'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ]);
 
@@ -326,8 +326,8 @@ class LicensingApiClient
 
         return match ($context) {
             'activation' => LicensingException::activationFailed($e->getMessage()),
-            'refresh'    => LicensingException::serverUnreachable(),
-            default      => LicensingException::serverUnreachable(),
+            'refresh' => LicensingException::serverUnreachable(),
+            default => LicensingException::serverUnreachable(),
         };
     }
 
@@ -339,7 +339,7 @@ class LicensingApiClient
         if (config('license-verifier.debug')) {
             Log::error($message, [
                 'exception' => $exception->getMessage(),
-                'trace'     => $exception->getTraceAsString(),
+                'trace' => $exception->getTraceAsString(),
             ]);
         }
     }

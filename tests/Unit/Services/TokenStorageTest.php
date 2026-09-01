@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 
 beforeEach(function (): void {
     $this->storage = new TokenStorage;
@@ -30,7 +30,7 @@ it('encrypts the token at rest', function (): void {
     expect(app(LicenseStore::class)->get($key)['token'])->toBe($token);
 
     // …and the persisted blob is ciphertext, never the plaintext token.
-    $records = rtrim((string) config('license-verifier.storage.path', storage_path('app/licensing')), '/') . '/records';
+    $records = rtrim((string) config('license-verifier.storage.path', storage_path('app/licensing')), '/').'/records';
     $raw = collect(File::files($records))->map(fn ($f): string => File::get($f->getPathname()))->implode("\n");
     expect($raw)->not->toContain($token);
 });
@@ -79,7 +79,7 @@ it('stores and retrieves last heartbeat', function (): void {
 it('stores and retrieves grace period data', function (): void {
     $data = [
         'started_at' => now()->toIso8601String(),
-        'reason'     => 'test-reason',
+        'reason' => 'test-reason',
     ];
 
     $this->storage->storeGracePeriodData($data);
@@ -107,8 +107,8 @@ it('clears all stored data', function (): void {
 
 it('stores and retrieves public key bundle', function (): void {
     $bundle = [
-        'signing'   => ['kid' => 'signing-1', 'public_key' => 'base64key'],
-        'root'      => ['kid' => 'root-1', 'public_key' => 'base64rootkey'],
+        'signing' => ['kid' => 'signing-1', 'public_key' => 'base64key'],
+        'root' => ['kid' => 'root-1', 'public_key' => 'base64rootkey'],
         'issued_at' => '2027-01-01T00:00:00+00:00',
     ];
 

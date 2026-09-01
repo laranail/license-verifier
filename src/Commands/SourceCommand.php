@@ -20,10 +20,10 @@ final class SourceCommand extends Command
         $key = $resolver->resolve();
 
         $data = [
-            'source'       => (string) config('license-verifier.source', 'config'),
-            'storage'      => (string) config('license-verifier.storage.driver', 'file'),
+            'source' => (string) config('license-verifier.source', 'config'),
+            'storage' => (string) config('license-verifier.storage.driver', 'file'),
             'resolved_key' => $this->mask($key),
-            'details'      => $resolver->details(),
+            'details' => $resolver->details(),
         ];
 
         if ($this->wantsJson()) {
@@ -33,8 +33,8 @@ final class SourceCommand extends Command
         }
 
         $this->services->display()->keyValue([
-            'Source'       => $data['source'],
-            'Storage'      => $data['storage'],
+            'Source' => $data['source'],
+            'Storage' => $data['storage'],
             'Resolved key' => $data['resolved_key'] ?? '(none)',
         ], 'License source');
 
@@ -51,6 +51,6 @@ final class SourceCommand extends Command
             return str_repeat('*', strlen($key));
         }
 
-        return substr($key, 0, 4) . str_repeat('*', strlen($key) - 8) . substr($key, -4);
+        return substr($key, 0, 4).str_repeat('*', strlen($key) - 8).substr($key, -4);
     }
 }

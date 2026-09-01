@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Cache;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Stores\FallbackLicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
 
 /** Re-resolve the LicenseStore after changing storage config. */
 function rebindStore(): void
@@ -49,7 +49,7 @@ it('persists the PASETO token in the cache store (encrypted) when storage.driver
 
     app(TokenStorage::class)->store('PASETO-CACHE-TOKEN', 'LIC-CACHE');
 
-    $raw = Cache::store('array')->get('license-verifier:record:' . hash('sha256', 'LIC-CACHE'));
+    $raw = Cache::store('array')->get('license-verifier:record:'.hash('sha256', 'LIC-CACHE'));
 
     expect($raw)->toBeString()->not->toContain('PASETO-CACHE-TOKEN')
         ->and(app(TokenStorage::class)->retrieve('LIC-CACHE'))->toBe('PASETO-CACHE-TOKEN');
@@ -68,7 +68,7 @@ it('wraps a remote primary with a file fallback and mirrors token writes', funct
     expect(DB::table('license_verifier_licenses')->where('key', 'LIC-MIRROR')->exists())->toBeTrue();
 
     // …and mirrored to the encrypted local file fallback.
-    $records = rtrim((string) config('license-verifier.storage.path'), '/') . '/records';
+    $records = rtrim((string) config('license-verifier.storage.path'), '/').'/records';
     $blob = collect(File::files($records))->map(fn ($f): string => File::get($f->getPathname()))->implode("\n");
 
     expect($blob)->not->toBe('')->and($blob)->not->toContain('MIRRORED-TOKEN');

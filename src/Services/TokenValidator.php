@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Services;
 
-use Exception;
-use Throwable;
 use Carbon\Carbon;
+use Exception;
+use ParagonIE\Paseto\Keys\Base\AsymmetricPublicKey;
 use ParagonIE\Paseto\Parser;
-use ParagonIE\Paseto\Rules\IssuedBy;
 use ParagonIE\Paseto\Protocol\Version4;
 use ParagonIE\Paseto\ProtocolCollection;
-use ParagonIE\Paseto\Keys\Base\AsymmetricPublicKey;
+use ParagonIE\Paseto\Rules\IssuedBy;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Throwable;
 
 class TokenValidator
 {
@@ -164,21 +164,21 @@ class TokenValidator
             $claims = $this->validate($token);
 
             return [
-                'license_id'         => $claims['license_id'] ?? null,
-                'license_key_hash'   => $claims['license_key_hash'] ?? null,
-                'status'             => $claims['status'] ?? null,
-                'max_usages'         => $claims['max_usages'] ?? null,
-                'expires_at'         => $claims['exp'] ?? null,
-                'issued_at'          => $claims['iat'] ?? null,
-                'not_before'         => $claims['nbf'] ?? null,
-                'issuer'             => $claims['iss'] ?? null,
+                'license_id' => $claims['license_id'] ?? null,
+                'license_key_hash' => $claims['license_key_hash'] ?? null,
+                'status' => $claims['status'] ?? null,
+                'max_usages' => $claims['max_usages'] ?? null,
+                'expires_at' => $claims['exp'] ?? null,
+                'issued_at' => $claims['iat'] ?? null,
+                'not_before' => $claims['nbf'] ?? null,
+                'issuer' => $claims['iss'] ?? null,
                 'license_expires_at' => $claims['license_expires_at'] ?? null,
                 'force_online_after' => $claims['force_online_after'] ?? null,
-                'grace_until'        => $claims['grace_until'] ?? null,
-                'usage_fingerprint'  => $claims['usage_fingerprint'] ?? null,
-                'licensable_type'    => $claims['licensable_type'] ?? null,
-                'licensable_id'      => $claims['licensable_id'] ?? null,
-                'entitlements'       => $claims['entitlements'] ?? null,
+                'grace_until' => $claims['grace_until'] ?? null,
+                'usage_fingerprint' => $claims['usage_fingerprint'] ?? null,
+                'licensable_type' => $claims['licensable_type'] ?? null,
+                'licensable_id' => $claims['licensable_id'] ?? null,
+                'entitlements' => $claims['entitlements'] ?? null,
             ];
         } catch (Exception) {
             return [];
@@ -273,8 +273,7 @@ class TokenValidator
      * `PasetoTokenService::verifyOffline` so the rotating signing key advertised in
      * the footer is the one that actually verifies the token.
      *
-     * @param array<string, mixed> $chain
-     *
+     * @param  array<string, mixed>  $chain
      * @return array<string, mixed>
      */
     protected function verifyChainedToken(string $token, array $chain): array
@@ -306,7 +305,7 @@ class TokenValidator
     /**
      * Verify the certificate chain from the token footer against the stored root key
      *
-     * @param array<string, mixed> $footer
+     * @param  array<string, mixed>  $footer
      */
     protected function verifyCertificateChain(array $footer): bool
     {

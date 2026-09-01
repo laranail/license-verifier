@@ -34,13 +34,13 @@ final class ManageCommand extends Command
             $this->renderDashboard();
 
             $action = $this->services->interaction()->askSelect('Choose an action', [
-                'activate'   => 'Activate a license',
-                'validate'   => 'Validate the license',
-                'refresh'    => 'Refresh the token',
+                'activate' => 'Activate a license',
+                'validate' => 'Validate the license',
+                'refresh' => 'Refresh the token',
                 'deactivate' => 'Deactivate the license',
-                'drivers'    => 'List drivers',
-                'doctor'     => 'Run diagnostics',
-                'quit'       => 'Quit',
+                'drivers' => 'List drivers',
+                'doctor' => 'Run diagnostics',
+                'quit' => 'Quit',
             ]);
 
             if ($action === 'quit') {
@@ -57,24 +57,24 @@ final class ManageCommand extends Command
 
         $this->services->display()->header('License Verifier');
         $this->services->display()->keyValue(array_filter([
-            'Driver'      => $this->manager()->getDefaultDriver(),
-            'Status'      => $info->status->label(),
+            'Driver' => $this->manager()->getDefaultDriver(),
+            'Status' => $info->status->label(),
             'Licensed to' => $info->licensedTo,
-            'Expires'     => $info->expiresAt,
-            'Seats'       => $info->seatsTotal !== null ? "{$info->seatsUsed} / {$info->seatsTotal}" : null,
+            'Expires' => $info->expiresAt,
+            'Seats' => $info->seatsTotal !== null ? "{$info->seatsUsed} / {$info->seatsTotal}" : null,
         ], static fn (?string $v): bool => $v !== null && $v !== ''));
     }
 
     private function dispatch(string $action): void
     {
         match ($action) {
-            'activate'   => $this->activate(),
-            'validate'   => $this->call(StatusCommand::class),
-            'refresh'    => $this->refresh(),
+            'activate' => $this->activate(),
+            'validate' => $this->call(StatusCommand::class),
+            'refresh' => $this->refresh(),
             'deactivate' => $this->deactivate(),
-            'drivers'    => $this->call(DriversCommand::class),
-            'doctor'     => $this->call(DoctorCommand::class),
-            default      => null,
+            'drivers' => $this->call(DriversCommand::class),
+            'doctor' => $this->call(DoctorCommand::class),
+            default => null,
         };
     }
 

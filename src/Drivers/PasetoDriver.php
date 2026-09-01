@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
+use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\Capability;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
 
 /**
  * The default driver: a thin adapter over the PASETO/Ed25519 engine
@@ -64,10 +64,10 @@ final readonly class PasetoDriver implements Driver, SupportsEntitlements, Suppo
     {
         return [
             [
-                'name'        => 'license_key',
-                'label'       => 'License key',
-                'type'        => 'text',
-                'required'    => true,
+                'name' => 'license_key',
+                'label' => 'License key',
+                'type' => 'text',
+                'required' => true,
                 'placeholder' => 'XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
             ],
         ];

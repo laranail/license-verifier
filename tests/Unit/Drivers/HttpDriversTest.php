@@ -3,24 +3,24 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\Drivers\NullDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\CryptolensDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\Drivers\EasyDigitalDownloadsDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\EnvatoDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\FreemiusDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\GenericHttpDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\GumroadDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\KeygenDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\LemonSqueezyDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\LicenseSpringDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\NullDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\PaddleDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\PasetoDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
-use Simtabi\Laranail\Licence\Verifier\Drivers\GumroadDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\FreemiusDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\UnlockShDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\CryptolensDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\GenericHttpDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\LemonSqueezyDriver;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\Drivers\LicenseSpringDriver;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\Drivers\EasyDigitalDownloadsDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\WooCommerceLicenseManagerDriver;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 
 beforeEach(function (): void {
     config()->set('license-verifier.storage.driver', 'database');
@@ -28,8 +28,8 @@ beforeEach(function (): void {
 
 it('verifies a Gumroad license', function (): void {
     Http::fake(['api.gumroad.com/*' => Http::response([
-        'success'  => true,
-        'uses'     => 1,
+        'success' => true,
+        'uses' => 1,
         'purchase' => ['email' => 'buyer@example.com', 'refunded' => false, 'created_at' => '2026-01-01'],
     ])]);
 
@@ -52,8 +52,8 @@ it('rejects an invalid Gumroad license', function (): void {
 
 it('activates a Lemon Squeezy license', function (): void {
     Http::fake(['api.lemonsqueezy.com/*' => Http::response([
-        'activated'   => true,
-        'instance'    => ['id' => 'inst_1'],
+        'activated' => true,
+        'instance' => ['id' => 'inst_1'],
         'license_key' => ['status' => 'active', 'expires_at' => '2027-01-01'],
     ])]);
 
@@ -80,7 +80,7 @@ it('activates an Envato/Botble-style purchase code and binds the domain', functi
 
     $driver = new EnvatoDriver([
         'server_url' => 'https://license.test',
-        'api_key'    => 'k',
+        'api_key' => 'k',
         'product_id' => 'prod',
     ]);
 
@@ -96,8 +96,8 @@ it('maps a bespoke service via the generic driver', function (): void {
     Http::fake(['custom.test/*' => Http::response(['meta' => ['valid' => true], 'data' => ['status' => 'active', 'expires_at' => '2028-01-01']])]);
 
     $driver = new GenericHttpDriver([
-        'base_url'     => 'https://custom.test',
-        'endpoints'    => ['validate' => ['method' => 'POST', 'path' => '/check']],
+        'base_url' => 'https://custom.test',
+        'endpoints' => ['validate' => ['method' => 'POST', 'path' => '/check']],
         'response_map' => ['valid' => 'meta.valid', 'status' => 'data.status', 'expires_at' => 'data.expires_at'],
     ]);
 

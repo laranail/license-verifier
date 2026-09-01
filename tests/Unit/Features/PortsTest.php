@@ -8,7 +8,7 @@ use Simtabi\Laranail\Licence\Verifier\Support\ReminderManager;
 use Simtabi\Laranail\Licence\Verifier\Support\ThirdPartyIpResolver;
 
 it('skips and clears the license reminder', function (): void {
-    config()->set('license-verifier.storage.path', sys_get_temp_dir() . '/lv-reminder-' . uniqid());
+    config()->set('license-verifier.storage.path', sys_get_temp_dir().'/lv-reminder-'.uniqid());
 
     $reminder = new ReminderManager;
 
@@ -25,7 +25,7 @@ it('skips and clears the license reminder', function (): void {
 });
 
 it('treats an elapsed reminder skip as not skipped', function (): void {
-    config()->set('license-verifier.storage.path', sys_get_temp_dir() . '/lv-reminder-' . uniqid());
+    config()->set('license-verifier.storage.path', sys_get_temp_dir().'/lv-reminder-'.uniqid());
 
     $reminder = new ReminderManager;
     $reminder->skip(-1); // already in the past

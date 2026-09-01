@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Illuminate\Support\Manager;
-use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
+use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
 
 /**
  * Resolves the active license driver from config('license-verifier.default').

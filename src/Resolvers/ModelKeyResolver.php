@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Resolvers;
 
 use Illuminate\Database\Eloquent\Model;
-use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
 
 /**
  * Resolves the license key from the most recently activated database record.
@@ -37,11 +37,11 @@ final readonly class ModelKeyResolver implements LicenseKeyResolver
         }
 
         return array_filter([
-            'licensed_to'  => $record->getAttribute('licensed_to'),
-            'domain'       => $record->getAttribute('domain'),
-            'status'       => $record->getAttribute('status'),
+            'licensed_to' => $record->getAttribute('licensed_to'),
+            'domain' => $record->getAttribute('domain'),
+            'status' => $record->getAttribute('status'),
             'activated_at' => optional($record->getAttribute('activated_at'))?->toIso8601String(),
-            'expires_at'   => optional($record->getAttribute('expires_at'))?->toIso8601String(),
+            'expires_at' => optional($record->getAttribute('expires_at'))?->toIso8601String(),
         ], static fn ($value): bool => $value !== null && $value !== '');
     }
 

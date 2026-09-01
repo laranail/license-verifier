@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Doctor;
 
-use Throwable;
 use Illuminate\Support\Facades\File;
 use Simtabi\Laranail\Package\Tools\Services\Doctor\DoctorCheck;
 use Simtabi\Laranail\Package\Tools\Services\Doctor\DoctorResult;
+use Throwable;
 
 /**
  * The license storage path must be writable.

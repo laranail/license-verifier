@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Illuminate\Http\Client\PendingRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -67,9 +67,9 @@ final class PaddleDriver extends AbstractHttpDriver
 
         if ($persist) {
             $this->remember($key, [
-                'status'     => 'active',
+                'status' => 'active',
                 'expires_at' => $expiresAt,
-                'metadata'   => ['entitlements' => (array) data_get($data, 'entitlements', [])],
+                'metadata' => ['entitlements' => (array) data_get($data, 'entitlements', [])],
             ]);
         }
 

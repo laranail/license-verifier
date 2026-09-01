@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Throwable;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\Capability;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeats;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
 use Simtabi\Laranail\Licence\Verifier\Drivers\Concerns\DispatchesLicenseEvents;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\Capability;
+use Throwable;
 
 /**
  * Shared HTTP plumbing for online (marketplace/commerce) drivers. TLS
@@ -31,7 +31,7 @@ abstract class AbstractHttpDriver implements Driver
     use DispatchesLicenseEvents;
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public function __construct(protected readonly array $config = []) {}
 
@@ -39,9 +39,9 @@ abstract class AbstractHttpDriver implements Driver
     {
         return [
             [
-                'name'     => 'license_key',
-                'label'    => 'License key',
-                'type'     => 'text',
+                'name' => 'license_key',
+                'label' => 'License key',
+                'type' => 'text',
                 'required' => true,
             ],
         ];
@@ -70,7 +70,7 @@ abstract class AbstractHttpDriver implements Driver
      * may be overridden per-driver via the driver's own config block, falling
      * back to the global `license-verifier.*` defaults.
      *
-     * @param array<string, string> $headers
+     * @param  array<string, string>  $headers
      */
     protected function http(array $headers = []): PendingRequest
     {
@@ -113,7 +113,7 @@ abstract class AbstractHttpDriver implements Driver
      */
     protected function httpDate(): string
     {
-        return gmdate('D, d M Y H:i:s') . ' GMT';
+        return gmdate('D, d M Y H:i:s').' GMT';
     }
 
     /**
@@ -162,7 +162,7 @@ abstract class AbstractHttpDriver implements Driver
     /**
      * Persist a minimal local record for an activated/verified license.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     protected function remember(string $key, array $data): void
     {

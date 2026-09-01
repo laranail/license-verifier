@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Illuminate\Support\Facades\URL;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 
 /**

@@ -29,9 +29,9 @@ final class SeatsCommand extends Command
         }
 
         return match ((string) $this->argument('action')) {
-            'list'   => $this->listSeats($manager),
+            'list' => $this->listSeats($manager),
             'revoke' => $this->revokeSeat($manager),
-            default  => $this->unknownAction(),
+            default => $this->unknownAction(),
         };
     }
 

@@ -23,10 +23,10 @@ final class ReminderCommand extends Command
         $action = (string) $this->argument('action');
 
         return match ($action) {
-            'skip'   => $this->skip($reminder),
-            'clear'  => $this->clear($reminder),
+            'skip' => $this->skip($reminder),
+            'clear' => $this->clear($reminder),
             'status' => $this->status($reminder),
-            default  => $this->invalid($action),
+            default => $this->invalid($action),
         };
     }
 
@@ -36,7 +36,7 @@ final class ReminderCommand extends Command
         $reminder->skip($days);
 
         $this->services->display()->success(
-            'License reminder skipped until ' . ($reminder->skippedUntil()?->toDayDateTimeString() ?? 'later') . '.',
+            'License reminder skipped until '.($reminder->skippedUntil()?->toDayDateTimeString() ?? 'later').'.',
         );
 
         return self::SUCCESS;
@@ -53,7 +53,7 @@ final class ReminderCommand extends Command
     private function status(ReminderManager $reminder): int
     {
         $reminder->isSkipped()
-            ? $this->services->display()->info('Reminder is skipped until ' . $reminder->skippedUntil()?->toDayDateTimeString() . '.')
+            ? $this->services->display()->info('Reminder is skipped until '.$reminder->skippedUntil()?->toDayDateTimeString().'.')
             : $this->services->display()->info('Reminder is active (not skipped).');
 
         return self::SUCCESS;
