@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Support;
 
-use Throwable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use Throwable;
 
 /**
  * "Skip the license reminder for N days" — ported from Botble's
@@ -19,7 +19,7 @@ final readonly class ReminderManager
     public function __construct()
     {
         $base = rtrim((string) config('license-verifier.storage.path', storage_path('app/licensing')), '/');
-        $this->file = $base . '/reminder.txt';
+        $this->file = $base.'/reminder.txt';
     }
 
     public function skip(?int $days = null): void

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
 
 beforeEach(function (): void {
     $this->apiClient = new LicensingApiClient;
@@ -14,11 +14,11 @@ it('activates a license successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
-            'data'    => [
-                'token'            => 'activated-token',
+            'data' => [
+                'token' => 'activated-token',
                 'token_expires_at' => now()->addYear()->toIso8601String(),
-                'license'          => ['id' => 'ulid-1', 'status' => 'active'],
-                'usage'            => ['id' => 1, 'fingerprint' => 'fp', 'status' => 'active'],
+                'license' => ['id' => 'ulid-1', 'status' => 'active'],
+                'usage' => ['id' => 1, 'fingerprint' => 'fp', 'status' => 'active'],
             ],
         ], 200),
     ]);
@@ -33,7 +33,7 @@ it('throws exception for invalid license key during activation', function (): vo
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'INVALID_KEY', 'message' => 'License key is invalid or not found'],
+            'error' => ['code' => 'INVALID_KEY', 'message' => 'License key is invalid or not found'],
         ], 404),
     ]);
 
@@ -44,7 +44,7 @@ it('throws exception when usage limit exceeded during activation', function (): 
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'USAGE_LIMIT_REACHED', 'message' => 'License has reached maximum usages'],
+            'error' => ['code' => 'USAGE_LIMIT_REACHED', 'message' => 'License has reached maximum usages'],
         ], 409),
     ]);
 
@@ -55,7 +55,7 @@ it('throws exception for suspended license during activation', function (): void
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'SUSPENDED_LICENSE', 'message' => 'License is suspended'],
+            'error' => ['code' => 'SUSPENDED_LICENSE', 'message' => 'License is suspended'],
         ], 423),
     ]);
 
@@ -66,7 +66,7 @@ it('deactivates a license successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/deactivate' => Http::response([
             'success' => true,
-            'data'    => ['message' => 'Usage revoked successfully'],
+            'data' => ['message' => 'Usage revoked successfully'],
         ], 200),
     ]);
 
@@ -80,7 +80,7 @@ it('deactivates a license with reason', function (): void {
     Http::fake([
         '*/api/licensing/v1/deactivate' => Http::response([
             'success' => true,
-            'data'    => ['message' => 'Usage revoked successfully'],
+            'data' => ['message' => 'Usage revoked successfully'],
         ], 200),
     ]);
 
@@ -95,10 +95,10 @@ it('refreshes a token successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => true,
-            'data'    => [
-                'token'            => 'refreshed-token',
+            'data' => [
+                'token' => 'refreshed-token',
                 'token_expires_at' => now()->addYear()->toIso8601String(),
-                'refresh_after'    => now()->addDays(6)->toIso8601String(),
+                'refresh_after' => now()->addDays(6)->toIso8601String(),
             ],
         ], 200),
     ]);
@@ -113,7 +113,7 @@ it('throws exception for fingerprint mismatch during refresh', function (): void
     Http::fake([
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'FINGERPRINT_MISMATCH', 'message' => 'Fingerprint does not match'],
+            'error' => ['code' => 'FINGERPRINT_MISMATCH', 'message' => 'Fingerprint does not match'],
         ], 403),
     ]);
 
@@ -124,7 +124,7 @@ it('sends heartbeat successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/heartbeat' => Http::response([
             'success' => true,
-            'data'    => [
+            'data' => [
                 'usage' => ['id' => 1, 'fingerprint' => 'fp', 'last_seen_at' => now()->toIso8601String()],
             ],
         ], 200),
@@ -152,9 +152,9 @@ it('validates a license successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/validate' => Http::response([
             'success' => true,
-            'data'    => [
+            'data' => [
                 'license' => ['id' => 'ulid-1', 'status' => 'active'],
-                'usage'   => ['id' => 1, 'status' => 'active'],
+                'usage' => ['id' => 1, 'status' => 'active'],
             ],
         ], 200),
     ]);
@@ -169,7 +169,7 @@ it('throws exception for expired license during validation', function (): void {
     Http::fake([
         '*/api/licensing/v1/validate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'EXPIRED_LICENSE', 'message' => 'License is expired'],
+            'error' => ['code' => 'EXPIRED_LICENSE', 'message' => 'License is expired'],
         ], 410),
     ]);
 
@@ -180,13 +180,13 @@ it('gets license information successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/licenses/show' => Http::response([
             'success' => true,
-            'data'    => [
+            'data' => [
                 'license' => [
-                    'id'              => 'ulid-1',
-                    'status'          => 'active',
-                    'max_usages'      => 5,
-                    'features'        => ['feature_a'],
-                    'active_usages'   => 2,
+                    'id' => 'ulid-1',
+                    'status' => 'active',
+                    'max_usages' => 5,
+                    'features' => ['feature_a'],
+                    'active_usages' => 2,
                     'available_seats' => 3,
                 ],
             ],
@@ -203,7 +203,7 @@ it('checks server health successfully', function (): void {
     Http::fake([
         '*/api/licensing/v1/health' => Http::response([
             'success' => true,
-            'data'    => [
+            'data' => [
                 'status' => 'healthy',
                 'checks' => ['database' => ['status' => 'ok']],
             ],
@@ -219,7 +219,7 @@ it('returns false when server is unhealthy', function (): void {
     Http::fake([
         '*/api/licensing/v1/health' => Http::response([
             'success' => true,
-            'data'    => [
+            'data' => [
                 'status' => 'degraded',
             ],
         ], 200),
@@ -244,7 +244,7 @@ it('throws rate limited exception on 429', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'RATE_LIMITED', 'message' => 'Too many requests'],
+            'error' => ['code' => 'RATE_LIMITED', 'message' => 'Too many requests'],
         ], 429),
     ]);
 
@@ -255,7 +255,7 @@ it('throws cancelled license exception on 423 with CANCELLED_LICENSE code', func
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'CANCELLED_LICENSE', 'message' => 'Cancelled'],
+            'error' => ['code' => 'CANCELLED_LICENSE', 'message' => 'Cancelled'],
         ], 423),
     ]);
 
@@ -266,7 +266,7 @@ it('throws fingerprint conflict on 409 with FINGERPRINT_CONFLICT code', function
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'FINGERPRINT_CONFLICT', 'message' => 'Conflict'],
+            'error' => ['code' => 'FINGERPRINT_CONFLICT', 'message' => 'Conflict'],
         ], 409),
     ]);
 
@@ -277,7 +277,7 @@ it('throws offline token disabled on 409 with OFFLINE_TOKEN_DISABLED code', func
     Http::fake([
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'OFFLINE_TOKEN_DISABLED', 'message' => 'Offline tokens disabled'],
+            'error' => ['code' => 'OFFLINE_TOKEN_DISABLED', 'message' => 'Offline tokens disabled'],
         ], 409),
     ]);
 
@@ -288,7 +288,7 @@ it('throws invalid configuration on 422', function (): void {
     Http::fake([
         '*/api/licensing/v1/validate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'VALIDATION_FAILED', 'message' => 'The fingerprint field is required'],
+            'error' => ['code' => 'VALIDATION_FAILED', 'message' => 'The fingerprint field is required'],
         ], 422),
     ]);
 
@@ -299,7 +299,7 @@ it('throws expired license on 410 during activation', function (): void {
     Http::fake([
         '*/api/licensing/v1/activate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'EXPIRED_LICENSE', 'message' => 'Expired'],
+            'error' => ['code' => 'EXPIRED_LICENSE', 'message' => 'Expired'],
         ], 410),
     ]);
 
@@ -310,7 +310,7 @@ it('throws not active on 403 without fingerprint mismatch', function (): void {
     Http::fake([
         '*/api/licensing/v1/validate' => Http::response([
             'success' => false,
-            'error'   => ['code' => 'LICENSE_NOT_ACTIVE', 'message' => 'Not active'],
+            'error' => ['code' => 'LICENSE_NOT_ACTIVE', 'message' => 'Not active'],
         ], 403),
     ]);
 
@@ -321,7 +321,7 @@ it('sends deactivate without reason when null', function (): void {
     Http::fake([
         '*/api/licensing/v1/deactivate' => Http::response([
             'success' => true,
-            'data'    => ['message' => 'Revoked'],
+            'data' => ['message' => 'Revoked'],
         ], 200),
     ]);
 

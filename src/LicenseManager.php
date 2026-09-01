@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier;
 
-use Throwable;
 use Carbon\Carbon;
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\PasetoDriver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\UnsupportedByDriverException;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
-use Simtabi\Laranail\Licence\Verifier\Drivers\Concerns\DispatchesLicenseEvents;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsEntitlements;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsHeartbeat;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsOfflineTokens;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsRefresh;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsSeatManagement;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Drivers\Concerns\DispatchesLicenseEvents;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\Drivers\PasetoDriver;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\UnsupportedByDriverException;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Throwable;
 
 /**
  * The single, driver-agnostic entry point for license operations. The facade,
@@ -60,7 +60,7 @@ class LicenseManager
      * requiresOnlineRefresh, startGracePeriod, clearAll, validate, …) to the
      * active driver, falling back to the PASETO engine where applicable.
      *
-     * @param array<int, mixed> $parameters
+     * @param  array<int, mixed>  $parameters
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -105,7 +105,7 @@ class LicenseManager
      * the change takes effect immediately — e.g.
      * LicenseVerifier::configure(['default' => 'gumroad', 'drivers.gumroad.product_id' => 'x']).
      *
-     * @param array<string, mixed> $overrides dotted keys relative to `license-verifier.`
+     * @param  array<string, mixed>  $overrides  dotted keys relative to `license-verifier.`
      */
     public function configure(array $overrides): static
     {
@@ -172,7 +172,7 @@ class LicenseManager
      * driver becomes the default so verify/deactivate target it. With no `$sources`
      * (and none configured) this is just {@see activate()} on the default driver.
      *
-     * @param list<string>|null $sources driver names; defaults to config('license-verifier.sources')
+     * @param  list<string>|null  $sources  driver names; defaults to config('license-verifier.sources')
      */
     public function activateAcross(string|LicenseRequest $request, ?array $sources = null, ?string $client = null): VerificationResult
     {
@@ -435,12 +435,12 @@ class LicenseManager
         }
 
         Log::channel(config('license-verifier.audit.channel'))->info('license.activation', [
-            'key_hash'    => substr(hash('sha256', $key), 0, 16),
-            'driver'      => $this->resolvedDriverName(),
-            'status'      => $result->status->value,
-            'valid'       => $result->valid,
+            'key_hash' => substr(hash('sha256', $key), 0, 16),
+            'driver' => $this->resolvedDriverName(),
+            'status' => $result->status->value,
+            'valid' => $result->valid,
             'licensed_to' => $result->licensedTo,
-            'at'          => Carbon::now()->toIso8601String(),
+            'at' => Carbon::now()->toIso8601String(),
         ]);
     }
 
@@ -455,7 +455,7 @@ class LicenseManager
         }
 
         $limiter = app(RateLimiter::class);
-        $bucket = 'license-verifier:activate:' . sha1($key);
+        $bucket = 'license-verifier:activate:'.sha1($key);
         $max = (int) config('license-verifier.rate_limit.max_attempts', 5);
 
         if ($limiter->tooManyAttempts($bucket, $max)) {
@@ -480,7 +480,7 @@ class LicenseManager
             return;
         }
 
-        $cacheKey = $this->cacheKey($key) . ':status';
+        $cacheKey = $this->cacheKey($key).':status';
         $previous = $this->cache()->get($cacheKey);
         $current = $result->status->value;
 
@@ -489,9 +489,9 @@ class LicenseManager
         }
 
         match ($result->status) {
-            LicenseStatus::Grace   => $this->eventGraceStarted($key, $result->licensedTo),
+            LicenseStatus::Grace => $this->eventGraceStarted($key, $result->licensedTo),
             LicenseStatus::Revoked => $this->eventRevoked($key, $result->licensedTo),
-            default                => null,
+            default => null,
         };
 
         $this->cache()->put($cacheKey, $current, now()->addDays(30));
@@ -532,7 +532,7 @@ class LicenseManager
     }
 
     /**
-     * @param array{result: VerificationResult, at: int}|null $entry
+     * @param  array{result: VerificationResult, at: int}|null  $entry
      */
     private function graceOrFail(?array $entry, ?Throwable $e): VerificationResult
     {
@@ -583,7 +583,7 @@ class LicenseManager
     }
 
     /**
-     * @param array{result: VerificationResult, at: int} $entry
+     * @param  array{result: VerificationResult, at: int}  $entry
      */
     private function isFresh(array $entry): bool
     {
@@ -593,7 +593,7 @@ class LicenseManager
     }
 
     /**
-     * @param array{result: VerificationResult, at: int} $entry
+     * @param  array{result: VerificationResult, at: int}  $entry
      */
     private function withinGrace(array $entry, int $graceDays): bool
     {
@@ -612,6 +612,6 @@ class LicenseManager
         $key = $key !== null && $key !== '' ? $key : (string) config('license-verifier.license_key', '');
         $prefix = (string) config('license-verifier.cache.key_prefix', 'license-verifier');
 
-        return $prefix . ':verify:' . $this->resolvedDriverName() . ':' . hash('sha256', $key);
+        return $prefix.':verify:'.$this->resolvedDriverName().':'.hash('sha256', $key);
     }
 }

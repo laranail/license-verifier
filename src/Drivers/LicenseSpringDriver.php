@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -38,7 +38,7 @@ final class LicenseSpringDriver extends AbstractHttpDriver
         $key ??= (string) config('license-verifier.license_key');
 
         rescue(fn () => $this->http($this->signedHeaders())->post('/api/v4/deactivate_license', array_filter([
-            'product'     => $this->cfg('product'),
+            'product' => $this->cfg('product'),
             'license_key' => $key,
             'hardware_id' => $this->fingerprint(null),
         ])), report: false);
@@ -64,7 +64,7 @@ final class LicenseSpringDriver extends AbstractHttpDriver
     {
         $response = $this->http($this->signedHeaders())
             ->get('/api/v4/check_license', array_filter([
-                'product'     => $this->cfg('product'),
+                'product' => $this->cfg('product'),
                 'license_key' => $key,
                 'hardware_id' => $hardwareId,
             ]));
@@ -78,9 +78,9 @@ final class LicenseSpringDriver extends AbstractHttpDriver
 
         if ($persist) {
             $this->remember($key, [
-                'status'     => 'active',
+                'status' => 'active',
                 'expires_at' => $data['validity_period'] ?? null,
-                'metadata'   => ['features' => $data['product_features'] ?? []],
+                'metadata' => ['features' => $data['product_features'] ?? []],
             ]);
         }
 
@@ -103,7 +103,7 @@ final class LicenseSpringDriver extends AbstractHttpDriver
             $signature = base64_encode(hash_hmac('sha256', "date: {$date}", $sharedKey, true));
 
             $headers['Date'] = $date;
-            $headers['Authorization'] = 'algorithm="hmac-sha256", headers="date", signature="' . $signature . '"';
+            $headers['Authorization'] = 'algorithm="hmac-sha256", headers="date", signature="'.$signature.'"';
         }
 
         return $headers;

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -18,7 +18,7 @@ use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 final readonly class NullDriver implements Driver
 {
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public function __construct(array $config = [])
     {

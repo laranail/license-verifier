@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Support;
 
-use Throwable;
 use Illuminate\Support\Facades\Http;
 use Simtabi\Laranail\Licence\Verifier\Contracts\IpResolver;
+use Throwable;
 
 /**
  * Resolves the server IP from a configured static IP, otherwise via a

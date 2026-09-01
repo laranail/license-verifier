@@ -35,8 +35,8 @@ final class DriversCommand extends Command
             }
 
             $rows[$name] = [
-                'driver'       => $name,
-                'default'      => $name === $default ? 'yes' : '',
+                'driver' => $name,
+                'default' => $name === $default ? 'yes' : '',
                 'capabilities' => $capabilities,
             ];
         }

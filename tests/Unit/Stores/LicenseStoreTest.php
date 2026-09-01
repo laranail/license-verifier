@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Log;
-use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
-use Simtabi\Laranail\Licence\Verifier\Stores\CacheStore;
-use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
-use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\Resolvers\ModelKeyResolver;
-use Simtabi\Laranail\Licence\Verifier\Resolvers\ConfigKeyResolver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
+use Simtabi\Laranail\Licence\Verifier\Resolvers\ConfigKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Resolvers\ModelKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Stores\CacheStore;
+use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
+use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
 
 dataset('stores', [
     'database' => fn (): DatabaseStore => new DatabaseStore,
-    'file'     => fn (): FileStore => new FileStore(sys_get_temp_dir() . '/lv-store-' . uniqid()),
-    'cache'    => fn (): CacheStore => new CacheStore('array'),
+    'file' => fn (): FileStore => new FileStore(sys_get_temp_dir().'/lv-store-'.uniqid()),
+    'cache' => fn (): CacheStore => new CacheStore('array'),
 ]);
 
 it('round-trips a license record', function (LicenseStore $store): void {
@@ -23,10 +23,10 @@ it('round-trips a license record', function (LicenseStore $store): void {
         ->and($store->get('KEY-1'))->toBeNull();
 
     $store->put('KEY-1', [
-        'key'         => 'KEY-1',
-        'driver'      => 'paseto',
+        'key' => 'KEY-1',
+        'driver' => 'paseto',
         'licensed_to' => 'Acme Inc',
-        'status'      => 'active',
+        'status' => 'active',
     ]);
 
     expect($store->has('KEY-1'))->toBeTrue()
@@ -40,13 +40,13 @@ it('round-trips a license record', function (LicenseStore $store): void {
 it('returns null and warns when a stored file record cannot be decrypted', function (): void {
     Log::spy();
 
-    $dir = sys_get_temp_dir() . '/lv-store-' . uniqid();
+    $dir = sys_get_temp_dir().'/lv-store-'.uniqid();
     $store = new FileStore($dir);
 
     $store->put('KEY-1', ['key' => 'KEY-1', 'status' => 'active']);
 
     // Corrupt the record on disk: present, but no longer decryptable.
-    $file = $dir . '/records/' . hash('sha256', 'KEY-1') . '.json';
+    $file = $dir.'/records/'.hash('sha256', 'KEY-1').'.json';
     file_put_contents($file, 'not-a-valid-ciphertext');
 
     expect($store->get('KEY-1'))->toBeNull();

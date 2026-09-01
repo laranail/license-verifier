@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Throwable;
 use Simtabi\Laranail\Licence\Verifier\Support\RsaPublicKey;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Throwable;
 
 /**
  * Cryptolens key activation — POST /api/key/Activate. The response is RSA-signed;
@@ -41,9 +41,9 @@ final class CryptolensDriver extends AbstractHttpDriver
 
         // Release the machine on Cryptolens; local forget happens regardless.
         rescue(fn () => $this->http()->asForm()->post('/api/key/Deactivate', array_filter([
-            'token'       => $this->cfg('token'),
-            'ProductId'   => $this->cfg('product_id'),
-            'Key'         => $key,
+            'token' => $this->cfg('token'),
+            'ProductId' => $this->cfg('product_id'),
+            'Key' => $key,
             'MachineCode' => $this->fingerprint(null),
         ])), report: false);
 
@@ -67,10 +67,10 @@ final class CryptolensDriver extends AbstractHttpDriver
     private function activateKey(string $key, string $machineCode, bool $persist): VerificationResult
     {
         $response = $this->http()->asForm()->post('/api/key/Activate', array_filter([
-            'token'       => $this->cfg('token'),
-            'ProductId'   => $this->cfg('product_id'),
-            'Key'         => $key,
-            'Sign'        => 'true',
+            'token' => $this->cfg('token'),
+            'ProductId' => $this->cfg('product_id'),
+            'Key' => $key,
+            'Sign' => 'true',
             'MachineCode' => $machineCode,
         ]));
 
@@ -97,9 +97,9 @@ final class CryptolensDriver extends AbstractHttpDriver
 
         if ($persist) {
             $this->remember($key, [
-                'status'     => 'active',
+                'status' => 'active',
                 'expires_at' => $expires,
-                'metadata'   => ['features' => $license['F1'] ?? null, 'signature' => $data['signature'] ?? null],
+                'metadata' => ['features' => $license['F1'] ?? null, 'signature' => $data['signature'] ?? null],
             ]);
         }
 

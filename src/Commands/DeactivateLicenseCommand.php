@@ -45,7 +45,7 @@ final class DeactivateLicenseCommand extends Command
 
             return self::FAILURE;
         } catch (Exception $e) {
-            $this->error('Deactivation failed: ' . $e->getMessage());
+            $this->error('Deactivation failed: '.$e->getMessage());
 
             return self::FAILURE;
         }

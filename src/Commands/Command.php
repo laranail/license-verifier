@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Commands;
 
-use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
 use Simtabi\Laranail\Console\Tools\Commands\Command as ConsoleCommand;
 use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
 
 /**
  * Base command for the license-verifier CLI/TUI suite. Provides the laranail
@@ -40,7 +40,7 @@ abstract class Command extends ConsoleCommand
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     protected function renderJson(array $data): void
     {

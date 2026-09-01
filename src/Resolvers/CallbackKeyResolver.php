@@ -13,8 +13,8 @@ use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
 final readonly class CallbackKeyResolver implements LicenseKeyResolver
 {
     /**
-     * @param Closure(): (string|null) $resolveUsing
-     * @param Closure(): array<string, mixed> $detailsUsing
+     * @param  Closure(): (string|null)  $resolveUsing
+     * @param  Closure(): array<string, mixed>  $detailsUsing
      */
     public function __construct(
         private Closure $resolveUsing,

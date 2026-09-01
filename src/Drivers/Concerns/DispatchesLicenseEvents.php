@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers\Concerns;
 
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseInvalid;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
 use Simtabi\Laranail\Licence\Verifier\Events\GracePeriodStarted;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivating;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivated;
-use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseDeactivating;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseHeartbeatSent;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseInvalid;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRefreshed;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseSeatRevoked;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseUnverified;
+use Simtabi\Laranail\Licence\Verifier\Events\LicenseVerified;
 
 /**
  * Shared lifecycle-event dispatching for drivers.

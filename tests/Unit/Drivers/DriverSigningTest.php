@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\Support\RsaPublicKey;
-use Simtabi\Laranail\Licence\Verifier\Drivers\FreemiusDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\CryptolensDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\FreemiusDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\LicenseSpringDriver;
+use Simtabi\Laranail\Licence\Verifier\Support\RsaPublicKey;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 
 /**
@@ -20,9 +20,9 @@ function rsaTestKeys(): array
 
     return [
         'priv' => $priv,
-        'pub'  => $details['key'],
-        'xml'  => '<RSAKeyValue><Modulus>' . base64_encode((string) $details['rsa']['n'])
-            . '</Modulus><Exponent>' . base64_encode((string) $details['rsa']['e']) . '</Exponent></RSAKeyValue>',
+        'pub' => $details['key'],
+        'xml' => '<RSAKeyValue><Modulus>'.base64_encode((string) $details['rsa']['n'])
+            .'</Modulus><Exponent>'.base64_encode((string) $details['rsa']['e']).'</Exponent></RSAKeyValue>',
     ];
 }
 
@@ -91,7 +91,7 @@ it('signs LicenseSpring requests with the HMAC Date signature', function (): voi
 
         return $request->hasHeader('Api-Key', 'k')
             && $date !== ''
-            && str_contains($request->header('Authorization')[0] ?? '', 'signature="' . $expected . '"');
+            && str_contains($request->header('Authorization')[0] ?? '', 'signature="'.$expected.'"');
     });
 });
 

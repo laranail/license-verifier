@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Illuminate\Http\Client\Response;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -77,9 +77,9 @@ final class GenericHttpDriver extends AbstractHttpDriver
         }
 
         $this->remember($key, [
-            'status'     => (string) (data_get($data, $map['status'] ?? 'status', 'active')),
+            'status' => (string) (data_get($data, $map['status'] ?? 'status', 'active')),
             'expires_at' => data_get($data, $map['expires_at'] ?? 'expires_at'),
-            'metadata'   => ['entitlements' => (array) data_get($data, $map['entitlements'] ?? 'entitlements', [])],
+            'metadata' => ['entitlements' => (array) data_get($data, $map['entitlements'] ?? 'entitlements', [])],
         ]);
 
         return VerificationResult::valid(
@@ -101,7 +101,7 @@ final class GenericHttpDriver extends AbstractHttpDriver
         $path = (string) ($endpoint['path'] ?? '/');
         $payload = array_filter([
             'license_key' => $key,
-            'client'      => $request?->client,
+            'client' => $request?->client,
             'fingerprint' => $request?->fingerprint,
         ], static fn (?string $v): bool => $v !== null);
 

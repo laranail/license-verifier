@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Commands;
 
 use Illuminate\Support\Facades\File;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 
 /**
  * Offline token operations for air-gapped activation (show|export|import).
@@ -33,7 +33,7 @@ final class TokenCommand extends Command
         return match ((string) $this->argument('action')) {
             'export' => $this->export($storage, $key),
             'import' => $this->import($storage, $key),
-            default  => $this->show($storage, $key),
+            default => $this->show($storage, $key),
         };
     }
 
@@ -53,7 +53,7 @@ final class TokenCommand extends Command
             return self::SUCCESS;
         }
 
-        $this->services->display()->success('A token is stored (' . strlen($token) . ' bytes).');
+        $this->services->display()->success('A token is stored ('.strlen($token).' bytes).');
         $this->services->display()->keyValue($this->engine()->getLicenseInfo($key));
 
         return self::SUCCESS;
@@ -69,7 +69,7 @@ final class TokenCommand extends Command
             return self::FAILURE;
         }
 
-        $path = (string) ($this->argument('path') ?: getcwd() . '/license.token');
+        $path = (string) ($this->argument('path') ?: getcwd().'/license.token');
         File::put($path, $token);
 
         $this->services->display()->success("Token exported to {$path}");

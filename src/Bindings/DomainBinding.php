@@ -59,7 +59,7 @@ final class DomainBinding
             return false;
         }
 
-        return array_any($allowed, fn ($candidate): bool => $host === $candidate || str_ends_with($host, '.' . $candidate));
+        return array_any($allowed, fn ($candidate): bool => $host === $candidate || str_ends_with($host, '.'.$candidate));
     }
 
     public function fails(?string $host = null): bool

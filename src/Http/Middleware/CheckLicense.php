@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Http\Middleware;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Http\Request;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**

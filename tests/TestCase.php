@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Tests;
 
-use ParagonIE\Paseto\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\File;
-use ParagonIE\Paseto\Protocol\Version4;
 use Orchestra\Testbench\TestCase as Orchestra;
+use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Keys\AsymmetricPublicKey;
 use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use ParagonIE\Paseto\Protocol\Version4;
 use Simtabi\Laranail\Licence\Verifier\Providers\LicenceVerifierServiceProvider;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
 
 class TestCase extends Orchestra
 {
@@ -27,7 +27,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName): string => 'Simtabi\\Laranail\\Licence\\Verifier\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName): string => 'Simtabi\\Laranail\\Licence\\Verifier\\Database\\Factories\\'.class_basename($modelName).'Factory',
         );
     }
 
@@ -48,13 +48,13 @@ class TestCase extends Orchestra
 
         config()->set('database.default', 'testing');
         config()->set('database.connections.testing', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
         // Set app key for encryption
-        config()->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
+        config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
         config()->set('license-verifier.server_url', 'https://licensing.test');
         config()->set('license-verifier.api_version', 'v1');
@@ -66,7 +66,7 @@ class TestCase extends Orchestra
         config()->set('license-verifier.heartbeat.enabled', false);
 
         // Run migrations
-        $migration = include __DIR__ . '/../database/migrations/create_license_verifier_table.php.stub';
+        $migration = include __DIR__.'/../database/migrations/create_license_verifier_table.php.stub';
         $migration->up();
     }
 
@@ -85,7 +85,7 @@ class TestCase extends Orchestra
             $this->publicKey = $this->privateKey->getPublicKey();
 
             // Set test storage path
-            $this->testStoragePath = sys_get_temp_dir() . '/licensing-test-' . uniqid();
+            $this->testStoragePath = sys_get_temp_dir().'/licensing-test-'.uniqid();
             File::makeDirectory($this->testStoragePath, 0755, true);
         }
     }
@@ -108,18 +108,18 @@ class TestCase extends Orchestra
     protected function defaultTestClaims(): array
     {
         return [
-            'sub'               => '1',
-            'iss'               => 'laravel-licensing',
-            'license_id'        => 1,
-            'license_key_hash'  => hash('sha256', 'TEST-LICENSE-KEY'),
+            'sub' => '1',
+            'iss' => 'laravel-licensing',
+            'license_id' => 1,
+            'license_key_hash' => hash('sha256', 'TEST-LICENSE-KEY'),
             'usage_fingerprint' => app(FingerprintGenerator::class)->generate(),
-            'status'            => 'active',
-            'max_usages'        => 5,
-            'exp'               => now()->addYear()->toIso8601String(),
+            'status' => 'active',
+            'max_usages' => 5,
+            'exp' => now()->addYear()->toIso8601String(),
             // Slightly in the past so PASETO's nbf/iat checks never race the
             // parse-time clock (deterministic across runs).
-            'nbf'                => now()->subMinute()->toIso8601String(),
-            'iat'                => now()->subMinute()->toIso8601String(),
+            'nbf' => now()->subMinute()->toIso8601String(),
+            'iat' => now()->subMinute()->toIso8601String(),
             'force_online_after' => now()->addDays(14)->toIso8601String(),
         ];
     }
@@ -127,8 +127,8 @@ class TestCase extends Orchestra
     /**
      * Generate a test token with a JSON footer (for certificate chain tests)
      *
-     * @param array<string, mixed> $claims
-     * @param array<string, mixed> $footer
+     * @param  array<string, mixed>  $claims
+     * @param  array<string, mixed>  $footer
      */
     protected function generateTestTokenWithFooter(array $claims = [], array $footer = []): string
     {
@@ -146,9 +146,9 @@ class TestCase extends Orchestra
      * chain in its footer — the realistic shape for cert-chain verification. The
      * cert-bound signing key is the one that verifies the token.
      *
-     * @param array{signing_secret_key: string, chain: array<string, mixed>} $chainData
-     * @param array<string, mixed> $claims
-     * @param array<string, mixed>|null $footerChain override the footer chain (e.g. to forge a mismatch)
+     * @param  array{signing_secret_key: string, chain: array<string, mixed>}  $chainData
+     * @param  array<string, mixed>  $claims
+     * @param  array<string, mixed>|null  $footerChain  override the footer chain (e.g. to forge a mismatch)
      */
     protected function generateTestTokenSignedByChain(array $chainData, array $claims = [], ?array $footerChain = null): string
     {
@@ -178,37 +178,37 @@ class TestCase extends Orchestra
         $signingSecretKey = sodium_crypto_sign_secretkey($signingKeypair);
 
         $certificate = [
-            'kid'         => 'test-signing-key',
-            'public_key'  => base64_encode($signingPublicKey),
-            'valid_from'  => now()->subDay()->toIso8601String(),
+            'kid' => 'test-signing-key',
+            'public_key' => base64_encode($signingPublicKey),
+            'valid_from' => now()->subDay()->toIso8601String(),
             'valid_until' => now()->addYear()->toIso8601String(),
-            'issued_at'   => now()->toIso8601String(),
-            'issuer_kid'  => 'test-root-key',
+            'issued_at' => now()->toIso8601String(),
+            'issuer_kid' => 'test-root-key',
         ];
 
         $signature = sodium_crypto_sign_detached(json_encode($certificate), $rootSecretKey);
 
         $signedCertificate = json_encode([
             'certificate' => $certificate,
-            'signature'   => base64_encode($signature),
+            'signature' => base64_encode($signature),
         ]);
 
         return [
-            'root_public_key'    => base64_encode($rootPublicKey),
+            'root_public_key' => base64_encode($rootPublicKey),
             'signing_public_key' => base64_encode($signingPublicKey),
             'signing_secret_key' => $signingSecretKey,
-            'chain'              => [
+            'chain' => [
                 'signing' => [
-                    'kid'         => 'test-signing-key',
-                    'public_key'  => base64_encode($signingPublicKey),
+                    'kid' => 'test-signing-key',
+                    'public_key' => base64_encode($signingPublicKey),
                     'certificate' => $signedCertificate,
-                    'valid_from'  => now()->subDay()->toIso8601String(),
+                    'valid_from' => now()->subDay()->toIso8601String(),
                     'valid_until' => now()->addYear()->toIso8601String(),
                 ],
                 'root' => [
-                    'kid'         => 'test-root-key',
-                    'public_key'  => base64_encode($rootPublicKey),
-                    'valid_from'  => now()->subYear()->toIso8601String(),
+                    'kid' => 'test-root-key',
+                    'public_key' => base64_encode($rootPublicKey),
+                    'valid_from' => now()->subYear()->toIso8601String(),
                     'valid_until' => now()->addYears(5)->toIso8601String(),
                 ],
             ],

@@ -14,7 +14,7 @@ use Simtabi\Laranail\Licence\Verifier\Models\LicenseRecord;
 |
 */
 
-$env = (static fn (string $key, mixed $default = null): mixed => env('LICENSE_VERIFIER_' . $key, env('LICENSING_' . $key, $default)));
+$env = (static fn (string $key, mixed $default = null): mixed => env('LICENSE_VERIFIER_'.$key, env('LICENSING_'.$key, $default)));
 
 return [
 
@@ -49,8 +49,8 @@ return [
     | Opt-in per-key throttle around activation (anti-brute-force). Off by default.
     */
     'rate_limit' => [
-        'enabled'       => (bool) $env('RATE_LIMIT', false),
-        'max_attempts'  => (int) $env('RATE_LIMIT_MAX', 5),
+        'enabled' => (bool) $env('RATE_LIMIT', false),
+        'max_attempts' => (int) $env('RATE_LIMIT_MAX', 5),
         'decay_seconds' => (int) $env('RATE_LIMIT_DECAY', 300),
     ],
 
@@ -75,7 +75,7 @@ return [
     */
     'license_key' => $env('KEY'),
     'licensed_to' => $env('LICENSED_TO'),
-    'public_key'  => $env('PUBLIC_KEY'),
+    'public_key' => $env('PUBLIC_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,12 +84,12 @@ return [
     | Kept at the top level for the default paseto driver. Other drivers read
     | their own block under `drivers.*` below.
     */
-    'server_url'         => $env('SERVER_URL', 'https://licensing.example.com'),
-    'api_version'        => $env('API_VERSION', 'v1'),
-    'issuer'             => $env('ISSUER', 'laravel-licensing'),
-    'timeout'            => (int) $env('TIMEOUT', 30),
+    'server_url' => $env('SERVER_URL', 'https://licensing.example.com'),
+    'api_version' => $env('API_VERSION', 'v1'),
+    'issuer' => $env('ISSUER', 'laravel-licensing'),
+    'timeout' => (int) $env('TIMEOUT', 30),
     'clock_skew_seconds' => (int) $env('CLOCK_SKEW_SECONDS', 60),
-    'grace_period_days'  => (int) $env('GRACE_PERIOD_DAYS', 7),
+    'grace_period_days' => (int) $env('GRACE_PERIOD_DAYS', 7),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,25 +101,25 @@ return [
     'drivers' => [
 
         'paseto' => [
-            'server_url'  => $env('SERVER_URL', 'https://licensing.example.com'),
+            'server_url' => $env('SERVER_URL', 'https://licensing.example.com'),
             'api_version' => $env('API_VERSION', 'v1'),
-            'issuer'      => $env('ISSUER', 'laravel-licensing'),
-            'public_key'  => $env('PUBLIC_KEY'),
+            'issuer' => $env('ISSUER', 'laravel-licensing'),
+            'public_key' => $env('PUBLIC_KEY'),
         ],
 
         'envato' => [
             // Marketplace / license server (Botble-style). LB-* headers.
-            'server_url'     => $env('ENVATO_SERVER_URL'),
-            'api_key'        => $env('ENVATO_API_KEY'),
+            'server_url' => $env('ENVATO_SERVER_URL'),
+            'api_key' => $env('ENVATO_API_KEY'),
             'personal_token' => $env('ENVATO_PERSONAL_TOKEN'),
-            'product_id'     => $env('ENVATO_PRODUCT_ID'),
-            'verify_type'    => $env('ENVATO_VERIFY_TYPE', 'envato'),
+            'product_id' => $env('ENVATO_PRODUCT_ID'),
+            'verify_type' => $env('ENVATO_VERIFY_TYPE', 'envato'),
         ],
 
         'keygen' => [
-            'account'    => $env('KEYGEN_ACCOUNT'),
-            'product'    => $env('KEYGEN_PRODUCT'),
-            'base_url'   => $env('KEYGEN_BASE_URL', 'https://api.keygen.sh'),
+            'account' => $env('KEYGEN_ACCOUNT'),
+            'product' => $env('KEYGEN_PRODUCT'),
+            'base_url' => $env('KEYGEN_BASE_URL', 'https://api.keygen.sh'),
             'public_key' => $env('KEYGEN_PUBLIC_KEY'),
         ],
 
@@ -129,75 +129,75 @@ return [
         ],
 
         'gumroad' => [
-            'product_id'        => $env('GUMROAD_PRODUCT_ID'),
+            'product_id' => $env('GUMROAD_PRODUCT_ID'),
             'product_permalink' => $env('GUMROAD_PRODUCT_PERMALINK'),
-            'access_token'      => $env('GUMROAD_ACCESS_TOKEN'),
-            'base_url'          => $env('GUMROAD_BASE_URL', 'https://api.gumroad.com'),
+            'access_token' => $env('GUMROAD_ACCESS_TOKEN'),
+            'base_url' => $env('GUMROAD_BASE_URL', 'https://api.gumroad.com'),
         ],
 
         // Request signing engages automatically once the relevant key is set; any
         // driver block may also override transport: timeout/verify_tls/retries/retry_delay.
         'cryptolens' => [
-            'token'      => $env('CRYPTOLENS_TOKEN'),
+            'token' => $env('CRYPTOLENS_TOKEN'),
             'product_id' => $env('CRYPTOLENS_PRODUCT_ID'),
             'public_key' => $env('CRYPTOLENS_RSA_PUBLIC_KEY'), // PEM or Cryptolens XML; verifies the signed response (fail-closed)
-            'base_url'   => $env('CRYPTOLENS_BASE_URL', 'https://api.cryptolens.io'),
+            'base_url' => $env('CRYPTOLENS_BASE_URL', 'https://api.cryptolens.io'),
         ],
 
         'licensespring' => [
-            'api_key'    => $env('LICENSESPRING_API_KEY'),
+            'api_key' => $env('LICENSESPRING_API_KEY'),
             'shared_key' => $env('LICENSESPRING_SHARED_KEY'), // enables the HMAC-SHA256 "Date" request signature
-            'product'    => $env('LICENSESPRING_PRODUCT'),
-            'base_url'   => $env('LICENSESPRING_BASE_URL', 'https://api.licensespring.com'),
+            'product' => $env('LICENSESPRING_PRODUCT'),
+            'base_url' => $env('LICENSESPRING_BASE_URL', 'https://api.licensespring.com'),
         ],
 
         'freemius' => [
             'product_id' => $env('FREEMIUS_PRODUCT_ID'),
             'public_key' => $env('FREEMIUS_PUBLIC_KEY'),
             'secret_key' => $env('FREEMIUS_SECRET_KEY'), // enables FS-Auth request signing
-            'base_url'   => $env('FREEMIUS_BASE_URL', 'https://api.freemius.com'),
+            'base_url' => $env('FREEMIUS_BASE_URL', 'https://api.freemius.com'),
         ],
 
         'edd' => [
             'store_url' => $env('EDD_STORE_URL'),
-            'item_id'   => $env('EDD_ITEM_ID'),
+            'item_id' => $env('EDD_ITEM_ID'),
             'item_name' => $env('EDD_ITEM_NAME'),
         ],
 
         'woocommerce' => [
-            'store_url'       => $env('WOOCOMMERCE_STORE_URL'),
-            'consumer_key'    => $env('WOOCOMMERCE_CONSUMER_KEY'),
+            'store_url' => $env('WOOCOMMERCE_STORE_URL'),
+            'consumer_key' => $env('WOOCOMMERCE_CONSUMER_KEY'),
             'consumer_secret' => $env('WOOCOMMERCE_CONSUMER_SECRET'),
         ],
 
         'paddle' => [
-            'api_key'    => $env('PADDLE_API_KEY'),
+            'api_key' => $env('PADDLE_API_KEY'),
             'product_id' => $env('PADDLE_PRODUCT_ID'),
-            'sandbox'    => (bool) $env('PADDLE_SANDBOX', false),
+            'sandbox' => (bool) $env('PADDLE_SANDBOX', false),
         ],
 
         'unlocksh' => [
-            'api_key'    => $env('UNLOCKSH_API_KEY'),
+            'api_key' => $env('UNLOCKSH_API_KEY'),
             'product_id' => $env('UNLOCKSH_PRODUCT_ID'),
-            'base_url'   => $env('UNLOCKSH_BASE_URL', 'https://api.unlock.sh'),
+            'base_url' => $env('UNLOCKSH_BASE_URL', 'https://api.unlock.sh'),
         ],
 
         'whop' => [
-            'api_key'    => $env('WHOP_API_KEY'),
+            'api_key' => $env('WHOP_API_KEY'),
             'product_id' => $env('WHOP_PRODUCT_ID'),
-            'base_url'   => $env('WHOP_BASE_URL', 'https://api.whop.com'),
+            'base_url' => $env('WHOP_BASE_URL', 'https://api.whop.com'),
         ],
 
         'anystack' => [
-            'api_key'    => $env('ANYSTACK_API_KEY'),
+            'api_key' => $env('ANYSTACK_API_KEY'),
             'product_id' => $env('ANYSTACK_PRODUCT_ID'),
-            'base_url'   => $env('ANYSTACK_BASE_URL', 'https://api.anystack.sh/v1'),
+            'base_url' => $env('ANYSTACK_BASE_URL', 'https://api.anystack.sh/v1'),
         ],
 
         // Configurable escape hatch — map any bespoke HTTP service without code.
         'generic' => [
-            'base_url'  => $env('GENERIC_BASE_URL'),
-            'headers'   => [],
+            'base_url' => $env('GENERIC_BASE_URL'),
+            'headers' => [],
             'endpoints' => [
                 // 'activate' => ['method' => 'POST', 'path' => '/activate'],
                 // 'validate' => ['method' => 'POST', 'path' => '/validate'],
@@ -206,9 +206,9 @@ return [
             ],
             // Dot-path mapping from the response JSON to normalized fields.
             'response_map' => [
-                'valid'        => 'meta.valid',
-                'status'       => 'data.status',
-                'expires_at'   => 'data.expires_at',
+                'valid' => 'meta.valid',
+                'status' => 'data.status',
+                'expires_at' => 'data.expires_at',
                 'entitlements' => 'data.entitlements',
             ],
         ],
@@ -243,10 +243,10 @@ return [
     | re-probing the primary.
     */
     'storage' => [
-        'driver'            => $env('STORAGE', 'file'),
-        'fallback'          => $env('STORAGE_FALLBACK', 'file'),
+        'driver' => $env('STORAGE', 'file'),
+        'fallback' => $env('STORAGE_FALLBACK', 'file'),
         'fallback_cooldown' => (int) $env('STORAGE_FALLBACK_COOLDOWN', 15),
-        'path'              => $env('STORAGE_PATH') ?: storage_path('app/licensing'),
+        'path' => $env('STORAGE_PATH') ?: storage_path('app/licensing'),
     ],
     // Back-compat alias used by TokenStorage.
     'storage_path' => $env('STORAGE_PATH') ?: storage_path('app/licensing'),
@@ -266,9 +266,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'cache' => [
-        'enabled'    => (bool) $env('CACHE_ENABLED', true),
-        'store'      => $env('CACHE_STORE', 'file'),
-        'ttl'        => (int) $env('CACHE_TTL', 3600),
+        'enabled' => (bool) $env('CACHE_ENABLED', true),
+        'store' => $env('CACHE_STORE', 'file'),
+        'ttl' => (int) $env('CACHE_TTL', 3600),
         'key_prefix' => (string) $env('CACHE_KEY_PREFIX', 'license-verifier'),
     ],
 
@@ -289,7 +289,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'heartbeat' => [
-        'enabled'  => (bool) $env('HEARTBEAT_ENABLED', true),
+        'enabled' => (bool) $env('HEARTBEAT_ENABLED', true),
         'interval' => (int) $env('HEARTBEAT_INTERVAL', 3600),
     ],
 
@@ -322,8 +322,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'ip' => [
-        'static_ip'      => $env('STATIC_IP'),
-        'lookup_url'     => $env('IP_LOOKUP_URL', 'https://ipecho.net/plain'),
+        'static_ip' => $env('STATIC_IP'),
+        'lookup_url' => $env('IP_LOOKUP_URL', 'https://ipecho.net/plain'),
         'lookup_timeout' => (int) $env('IP_LOOKUP_TIMEOUT', 5),
     ],
 
@@ -338,7 +338,7 @@ return [
         // Fail open within the grace window when the server is unreachable.
         'fail_open_in_grace' => (bool) $env('FAIL_OPEN_IN_GRACE', true),
         // Transient-failure retry policy for HTTP drivers.
-        'retries'     => (int) $env('HTTP_RETRIES', 2),
+        'retries' => (int) $env('HTTP_RETRIES', 2),
         'retry_delay' => (int) $env('HTTP_RETRY_DELAY', 200),
     ],
 
@@ -376,8 +376,8 @@ return [
     | 503 degraded) for monitoring.
     */
     'api' => [
-        'enabled'    => (bool) $env('API_ENABLED', false),
-        'prefix'     => (string) $env('API_PREFIX', 'api/license-verifier/v1'),
+        'enabled' => (bool) $env('API_ENABLED', false),
+        'prefix' => (string) $env('API_PREFIX', 'api/license-verifier/v1'),
         'middleware' => ['api'],
     ],
 ];

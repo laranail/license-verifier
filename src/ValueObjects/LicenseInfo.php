@@ -10,8 +10,8 @@ namespace Simtabi\Laranail\Licence\Verifier\ValueObjects;
 final readonly class LicenseInfo
 {
     /**
-     * @param array<string, mixed> $entitlements
-     * @param array<string, mixed> $raw
+     * @param  array<string, mixed>  $entitlements
+     * @param  array<string, mixed>  $raw
      */
     public function __construct(
         public LicenseStatus $status,
@@ -34,7 +34,7 @@ final readonly class LicenseInfo
     /**
      * Build from the engine's flat license-info array (PASETO shape) with sensible fallbacks.
      *
-     * @param array<string, mixed> $info
+     * @param  array<string, mixed>  $info
      */
     public static function fromArray(array $info): self
     {
@@ -62,14 +62,14 @@ final readonly class LicenseInfo
     public function toArray(): array
     {
         return [
-            'status'       => $this->status->value,
-            'licensed_to'  => $this->licensedTo,
+            'status' => $this->status->value,
+            'licensed_to' => $this->licensedTo,
             'activated_at' => $this->activatedAt,
-            'expires_at'   => $this->expiresAt,
-            'seats_used'   => $this->seatsUsed,
-            'seats_total'  => $this->seatsTotal,
-            'domain'       => $this->domain,
-            'fingerprint'  => $this->fingerprint,
+            'expires_at' => $this->expiresAt,
+            'seats_used' => $this->seatsUsed,
+            'seats_total' => $this->seatsTotal,
+            'domain' => $this->domain,
+            'fingerprint' => $this->fingerprint,
             'entitlements' => $this->entitlements,
         ];
     }

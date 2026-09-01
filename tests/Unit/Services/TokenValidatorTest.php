@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
 
 beforeEach(function (): void {
     $this->fingerprintGenerator = new FingerprintGenerator;
@@ -52,7 +52,7 @@ it('throws exception for invalid license status', function (): void {
 
 it('allows grace status', function (): void {
     $token = $this->generateTestToken([
-        'status'      => 'grace',
+        'status' => 'grace',
         'grace_until' => now()->addDays(7)->toIso8601String(),
     ]);
 
@@ -110,9 +110,9 @@ it('checks if token is expiring soon', function (): void {
 
 it('extracts license information from token', function (): void {
     $token = $this->generateTestToken([
-        'license_id'         => 42,
-        'status'             => 'active',
-        'max_usages'         => 10,
+        'license_id' => 42,
+        'status' => 'active',
+        'max_usages' => 10,
         'license_expires_at' => '2027-12-31T23:59:59+00:00',
         'force_online_after' => now()->addDays(14)->toIso8601String(),
     ]);
@@ -120,9 +120,9 @@ it('extracts license information from token', function (): void {
     $info = $this->validator->extractLicenseInfo($token);
 
     expect($info)->toMatchArray([
-        'license_id'         => 42,
-        'status'             => 'active',
-        'max_usages'         => 10,
+        'license_id' => 42,
+        'status' => 'active',
+        'max_usages' => 10,
         'license_expires_at' => '2027-12-31T23:59:59+00:00',
     ]);
 });
@@ -300,12 +300,12 @@ it('accepts token without footer for backward compatibility', function (): void 
 
 it('extracts license info with new fields', function (): void {
     $token = $this->generateTestToken([
-        'license_id'      => 42,
-        'status'          => 'active',
-        'max_usages'      => 10,
+        'license_id' => 42,
+        'status' => 'active',
+        'max_usages' => 10,
         'licensable_type' => 'App\\Models\\User',
-        'licensable_id'   => 99,
-        'entitlements'    => ['feature_a', 'feature_b'],
+        'licensable_id' => 99,
+        'entitlements' => ['feature_a', 'feature_b'],
     ]);
 
     $info = $this->validator->extractLicenseInfo($token);

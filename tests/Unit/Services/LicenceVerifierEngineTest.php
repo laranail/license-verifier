@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
 
 beforeEach(function (): void {
     $this->fingerprintGenerator = Mockery::mock(FingerprintGenerator::class);
@@ -39,9 +39,9 @@ it('activates a license successfully', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => [
-                'token'             => 'activated-token',
-                'refresh_after'     => '2027-01-07T00:00:00+00:00',
+            'data' => [
+                'token' => 'activated-token',
+                'refresh_after' => '2027-01-07T00:00:00+00:00',
                 'public_key_bundle' => ['signing' => ['kid' => 'k1']],
             ],
         ]);
@@ -156,7 +156,7 @@ it('refreshes a license token', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => ['token' => 'refreshed-token'],
+            'data' => ['token' => 'refreshed-token'],
         ]);
 
     $this->tokenStorage->shouldReceive('store')
@@ -211,7 +211,7 @@ it('gets license information', function (): void {
 
     $licenseInfo = [
         'license_id' => 1,
-        'status'     => 'active',
+        'status' => 'active',
         'expires_at' => now()->addYear()->toIso8601String(),
     ];
 
@@ -394,7 +394,7 @@ it('returns false for isInGracePeriod when no grace data', function (): void {
 it('initializes from stored bundle on boot', function (): void {
     $bundle = [
         'signing' => ['public_key' => 'signing-key-base64'],
-        'root'    => ['public_key' => 'root-key-base64'],
+        'root' => ['public_key' => 'root-key-base64'],
     ];
 
     $this->tokenStorage->shouldReceive('getPublicKeyBundle')
@@ -428,7 +428,7 @@ it('applies public key bundle when activating', function (): void {
 
     $bundle = [
         'signing' => ['public_key' => 'new-signing-key'],
-        'root'    => ['public_key' => 'new-root-key'],
+        'root' => ['public_key' => 'new-root-key'],
     ];
 
     $this->fingerprintGenerator->shouldReceive('getMetadata')
@@ -439,8 +439,8 @@ it('applies public key bundle when activating', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => [
-                'token'             => 'test-token',
+            'data' => [
+                'token' => 'test-token',
                 'public_key_bundle' => $bundle,
             ],
         ]);
@@ -483,8 +483,8 @@ it('stores entitlements from server response', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => [
-                'token'   => 'test-token',
+            'data' => [
+                'token' => 'test-token',
                 'license' => [
                     'entitlements' => ['api_access', 'premium'],
                 ],

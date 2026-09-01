@@ -39,7 +39,7 @@ final class RefreshLicenseCommand extends Command
 
             return self::FAILURE;
         } catch (Exception $e) {
-            $this->error('Token refresh failed: ' . $e->getMessage());
+            $this->error('Token refresh failed: '.$e->getMessage());
 
             return self::FAILURE;
         }

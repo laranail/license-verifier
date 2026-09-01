@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -56,7 +56,7 @@ final class WooCommerceLicenseManagerDriver extends AbstractHttpDriver
     {
         $response = $this->http()
             ->withBasicAuth((string) $this->cfg('consumer_key'), (string) $this->cfg('consumer_secret'))
-            ->get(rtrim((string) $this->cfg('store_url'), '/') . "/wp-json/lmfwc/v2/licenses/{$action}/" . rawurlencode($key));
+            ->get(rtrim((string) $this->cfg('store_url'), '/')."/wp-json/lmfwc/v2/licenses/{$action}/".rawurlencode($key));
 
         $data = (array) $response->json();
         $valid = (bool) ($data['success'] ?? false);
@@ -69,7 +69,7 @@ final class WooCommerceLicenseManagerDriver extends AbstractHttpDriver
 
         if ($persist) {
             $this->remember($key, [
-                'status'     => (string) ($license['status'] ?? 'active'),
+                'status' => (string) ($license['status'] ?? 'active'),
                 'expires_at' => $license['expiresAt'] ?? null,
             ]);
         }

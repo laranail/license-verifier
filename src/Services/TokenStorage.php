@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Services;
 
-use Throwable;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Throwable;
 
 /**
  * Persists the PASETO offline token and protocol metadata through the configured
@@ -36,9 +36,9 @@ class TokenStorage
             $record = $this->key($key);
 
             $this->records()->put($record, [
-                'key'    => $record,
+                'key' => $record,
                 'driver' => 'paseto',
-                'token'  => $token,
+                'token' => $token,
             ]);
         } catch (Throwable $e) {
             throw LicensingException::tokenStorageFailed($e->getMessage());
@@ -79,7 +79,7 @@ class TokenStorage
     }
 
     /**
-     * @param array<string, mixed> $bundle
+     * @param  array<string, mixed>  $bundle
      */
     public function storePublicKeyBundle(array $bundle): void
     {
@@ -109,7 +109,7 @@ class TokenStorage
     }
 
     /**
-     * @param array<string, mixed> $entitlements
+     * @param  array<string, mixed>  $entitlements
      */
     public function storeEntitlements(array $entitlements): void
     {
@@ -127,7 +127,7 @@ class TokenStorage
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function storeGracePeriodData(array $data): void
     {
@@ -188,13 +188,13 @@ class TokenStorage
     /**
      * Merge a patch into the global server-metadata record (read-modify-write).
      *
-     * @param array<string, mixed> $patch
+     * @param  array<string, mixed>  $patch
      */
     private function writeServerMetadata(array $patch): void
     {
         $this->records()->put(self::SERVER_KEY, [
-            'key'      => self::SERVER_KEY,
-            'driver'   => 'paseto',
+            'key' => self::SERVER_KEY,
+            'driver' => 'paseto',
             'metadata' => array_merge($this->serverMetadata(), $patch),
         ]);
     }

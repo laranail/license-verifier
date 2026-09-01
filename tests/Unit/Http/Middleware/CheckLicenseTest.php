@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
-use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 function middlewareWith(LicenseManager $manager): CheckLicense
 {

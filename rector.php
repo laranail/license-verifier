@@ -7,12 +7,12 @@ use Rector\Set\ValueObject\SetList;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/src',
-        __DIR__ . '/config',
-        __DIR__ . '/database',
-        __DIR__ . '/tests',
+        __DIR__.'/src',
+        __DIR__.'/config',
+        __DIR__.'/database',
+        __DIR__.'/tests',
     ])
-    ->withSkipPath(__DIR__ . '/vendor')
+    ->withSkipPath(__DIR__.'/vendor')
     ->withPhpSets(php84: true)
     ->withSets([
         SetList::CODE_QUALITY,

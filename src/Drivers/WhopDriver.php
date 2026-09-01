@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Override;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -83,8 +83,8 @@ final class WhopDriver extends AbstractHttpDriver
 
         $this->remember($key, [
             'licensed_to' => $licensedTo,
-            'status'      => 'active',
-            'token'       => (string) ($data['id'] ?? $key),
+            'status' => 'active',
+            'token' => (string) ($data['id'] ?? $key),
         ]);
 
         return VerificationResult::valid(

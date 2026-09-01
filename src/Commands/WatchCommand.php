@@ -47,13 +47,13 @@ final class WatchCommand extends Command
     {
         $info = $this->driver()->getLicenseInfo();
 
-        $this->services->display()->header('License — ' . now()->toTimeString());
+        $this->services->display()->header('License — '.now()->toTimeString());
         $this->services->display()->keyValue(array_filter([
-            'Driver'      => $this->manager()->getDefaultDriver(),
-            'Status'      => $info->status->label(),
+            'Driver' => $this->manager()->getDefaultDriver(),
+            'Status' => $info->status->label(),
             'Licensed to' => $info->licensedTo,
-            'Expires'     => $info->expiresAt,
-            'Seats'       => $info->seatsTotal !== null ? "{$info->seatsUsed} / {$info->seatsTotal}" : null,
+            'Expires' => $info->expiresAt,
+            'Seats' => $info->seatsTotal !== null ? "{$info->seatsUsed} / {$info->seatsTotal}" : null,
         ], static fn (?string $v): bool => $v !== null && $v !== ''));
     }
 }
