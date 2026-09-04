@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier;
 
-use Carbon\Carbon;
 use Exception;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
+use Carbon\Carbon;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
 
 class LicenceVerifier
 {
@@ -169,7 +169,7 @@ class LicenceVerifier
         try {
             $fingerprint = $this->fingerprintGenerator->generate();
             $response = $this->apiClient->heartbeat($licenseKey, $fingerprint, [
-                'version' => app()->version(),
+                'version'     => app()->version(),
                 'environment' => app()->environment(),
             ]);
 
@@ -300,7 +300,7 @@ class LicenceVerifier
     {
         $this->tokenStorage->storeGracePeriodData([
             'started_at' => now()->toIso8601String(),
-            'reason' => 'server_unreachable',
+            'reason'     => 'server_unreachable',
         ]);
     }
 

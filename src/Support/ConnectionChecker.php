@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Support;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 /**
  * Cached "can I reach the license server?" pre-check (ported from Botble's
@@ -34,6 +34,6 @@ final readonly class ConnectionChecker
 
     private function cacheKey(): string
     {
-        return 'license-verifier:connection:'.$this->drivers->getDefaultDriver();
+        return 'license-verifier:connection:' . $this->drivers->getDefaultDriver();
     }
 }

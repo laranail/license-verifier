@@ -19,8 +19,8 @@ final class DriverCommand extends Command
         $driver = $this->manager()->driver($name);
 
         $data = [
-            'driver' => $name,
-            'capabilities' => $driver->capabilities(),
+            'driver'            => $name,
+            'capabilities'      => $driver->capabilities(),
             'activation_fields' => array_column($driver->activationFields(), 'name'),
         ];
 
@@ -38,7 +38,7 @@ final class DriverCommand extends Command
             $this->renderJson($data);
         } else {
             $this->services->display()->keyValue([
-                'Driver' => $name,
+                'Driver'       => $name,
                 'Capabilities' => implode(', ', $driver->capabilities()) ?: '—',
             ]);
 

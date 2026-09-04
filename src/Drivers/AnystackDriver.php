@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
 
 /**
  * Anystack.sh licensing (REST API v1) with fingerprint/host activation.
@@ -31,10 +31,10 @@ final class AnystackDriver extends AbstractHttpDriver implements SupportsDomainB
         $host = $this->host();
 
         $response = $this->http($this->auth())->post("/products/{$this->cfg('product_id')}/licenses/activate-key", [
-            'key' => $request->key,
+            'key'         => $request->key,
             'fingerprint' => $host,
-            'hostname' => $host,
-            'platform' => 'web',
+            'hostname'    => $host,
+            'platform'    => 'web',
         ]);
 
         $data = (array) $response->json('data', []);
@@ -50,9 +50,9 @@ final class AnystackDriver extends AbstractHttpDriver implements SupportsDomainB
 
         $this->remember($request->key, [
             'licensed_to' => $request->client,
-            'domain' => $host,
-            'token' => $activationId.'|'.($data['license_id'] ?? ''),
-            'status' => 'active',
+            'domain'      => $host,
+            'token'       => $activationId . '|' . ($data['license_id'] ?? ''),
+            'status'      => 'active',
         ]);
 
         return VerificationResult::valid(licensedTo: $request->client, raw: $data);
@@ -64,7 +64,7 @@ final class AnystackDriver extends AbstractHttpDriver implements SupportsDomainB
         $record = (array) $this->store()->get($key);
 
         $response = $this->http($this->auth())->post("/products/{$this->cfg('product_id')}/licenses/validate-key", [
-            'key' => $key,
+            'key'         => $key,
             'fingerprint' => (string) ($record['domain'] ?? $this->host()),
         ]);
 

@@ -33,12 +33,12 @@ class FingerprintGenerator
     public function getMetadata(): array
     {
         return [
-            'hostname' => $this->getHostname(),
-            'os' => PHP_OS_FAMILY,
-            'php_version' => $this->getPhpVersion(),
+            'hostname'        => $this->getHostname(),
+            'os'              => PHP_OS_FAMILY,
+            'php_version'     => $this->getPhpVersion(),
             'laravel_version' => $this->getLaravelVersion(),
-            'environment' => App::environment(),
-            'timezone' => config('app.timezone'),
+            'environment'     => App::environment(),
+            'timezone'        => config('app.timezone'),
         ];
     }
 

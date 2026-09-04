@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Doctor;
 
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\Stores\FallbackLicenseStore;
 use Simtabi\Laranail\Package\Tools\Services\Doctor\DoctorCheck;
 use Simtabi\Laranail\Package\Tools\Services\Doctor\DoctorResult;
+use Simtabi\Laranail\Licence\Verifier\Stores\FallbackLicenseStore;
 
 /**
  * Report the storage backend and any active fallback / pending sync.
@@ -38,7 +38,7 @@ final class StorageBackendCheck implements DoctorCheck
                 return DoctorResult::warn("{$driver} unreachable — serving local fallback ({$pending} pending sync)");
             }
 
-            return DoctorResult::pass("{$driver} (primary) + {$fallback} fallback".($pending > 0 ? " — {$pending} pending sync" : ''));
+            return DoctorResult::pass("{$driver} (primary) + {$fallback} fallback" . ($pending > 0 ? " — {$pending} pending sync" : ''));
         }
 
         return DoctorResult::pass($driver);

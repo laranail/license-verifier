@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Illuminate\Http\Client\Response;
 use Override;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
+use Illuminate\Http\Client\Response;
 use Simtabi\Laranail\Licence\Verifier\Contracts\IpResolver;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
 
 /**
  * Envato / CodeCanyon purchase-code activation against a Botble-style license
@@ -38,10 +38,10 @@ final class EnvatoDriver extends AbstractHttpDriver implements SupportsDomainBin
     public function activate(LicenseRequest $request): VerificationResult
     {
         $response = $this->lbRequest('/api/activate_license', [
-            'product_id' => $this->cfg('product_id'),
+            'product_id'   => $this->cfg('product_id'),
             'license_code' => $request->key,
-            'client_name' => $request->client,
-            'verify_type' => $this->cfg('verify_type', 'envato'),
+            'client_name'  => $request->client,
+            'verify_type'  => $this->cfg('verify_type', 'envato'),
         ]);
 
         $data = (array) $response->json();
@@ -55,11 +55,11 @@ final class EnvatoDriver extends AbstractHttpDriver implements SupportsDomainBin
         }
 
         $this->remember($request->key, [
-            'status' => 'active',
+            'status'      => 'active',
             'licensed_to' => $request->client,
-            'domain' => $this->host(),
-            'token' => $data['lic_response'] ?? null,
-            'metadata' => ['license_file' => $data['lic_response'] ?? null],
+            'domain'      => $this->host(),
+            'token'       => $data['lic_response'] ?? null,
+            'metadata'    => ['license_file' => $data['lic_response'] ?? null],
         ]);
 
         return VerificationResult::valid(licensedTo: $request->client, raw: $data);
@@ -76,7 +76,7 @@ final class EnvatoDriver extends AbstractHttpDriver implements SupportsDomainBin
         }
 
         $response = $this->lbRequest('/api/verify_license', [
-            'product_id' => $this->cfg('product_id'),
+            'product_id'   => $this->cfg('product_id'),
             'license_file' => $licenseFile,
         ]);
 
@@ -96,7 +96,7 @@ final class EnvatoDriver extends AbstractHttpDriver implements SupportsDomainBin
         $licenseFile = $record['metadata']['license_file'] ?? $record['token'] ?? null;
 
         $response = $this->lbRequest('/api/deactivate_license', array_filter([
-            'product_id' => $this->cfg('product_id'),
+            'product_id'   => $this->cfg('product_id'),
             'license_file' => $licenseFile,
         ]));
 
@@ -123,15 +123,15 @@ final class EnvatoDriver extends AbstractHttpDriver implements SupportsDomainBin
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     private function lbRequest(string $path, array $data, string $method = 'POST'): Response
     {
         $request = $this->http([
             'LB-API-KEY' => (string) $this->cfg('api_key'),
-            'LB-URL' => rtrim((string) url('/'), '/'),
-            'LB-IP' => app(IpResolver::class)->resolve(),
-            'LB-LANG' => 'english',
+            'LB-URL'     => rtrim((string) url('/'), '/'),
+            'LB-IP'      => app(IpResolver::class)->resolve(),
+            'LB-LANG'    => 'english',
         ]);
 
         return $method === 'GET' ? $request->get($path, $data) : $request->post($path, $data);

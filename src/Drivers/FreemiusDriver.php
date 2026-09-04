@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Illuminate\Http\Client\Response;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -26,7 +26,7 @@ final class FreemiusDriver extends AbstractHttpDriver
         $uri = "/v1/products/{$productId}/licenses/activate.json";
 
         $response = $this->signedRequest('POST', $uri, array_filter([
-            'uid' => $this->fingerprint($request->fingerprint),
+            'uid'         => $this->fingerprint($request->fingerprint),
             'license_key' => $request->key,
         ]));
 
@@ -41,9 +41,9 @@ final class FreemiusDriver extends AbstractHttpDriver
         }
 
         $this->remember($request->key, [
-            'status' => 'active',
+            'status'     => 'active',
             'expires_at' => $data['expiration'] ?? null,
-            'metadata' => ['install_id' => $data['install_id'] ?? null, 'install_api_token' => $data['install_api_token'] ?? null],
+            'metadata'   => ['install_id' => $data['install_id'] ?? null, 'install_api_token' => $data['install_api_token'] ?? null],
         ]);
 
         return VerificationResult::valid(expiresAt: $data['expiration'] ?? null, raw: $data);
@@ -98,7 +98,7 @@ final class FreemiusDriver extends AbstractHttpDriver
      * Send a request with the body digest matched byte-for-byte and FS-Auth signed
      * (when a secret key is configured).
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     private function signedRequest(string $method, string $uri, array $params = []): Response
     {
@@ -128,12 +128,12 @@ final class FreemiusDriver extends AbstractHttpDriver
         $contentType = $body === '' ? '' : 'application/json';
         $date = $this->httpDate();
 
-        $stringToSign = $method."\n".$contentMd5."\n".$contentType."\n".$date."\n".$uri;
+        $stringToSign = $method . "\n" . $contentMd5 . "\n" . $contentType . "\n" . $date . "\n" . $uri;
         $signature = rtrim(strtr(base64_encode(hash_hmac('sha256', $stringToSign, $secret, true)), '+/', '-_'), '=');
 
         $headers = [
-            'Date' => $date,
-            'Authorization' => 'FS product:'.($this->cfg('product_id')).':'.$signature,
+            'Date'          => $date,
+            'Authorization' => 'FS product:' . ($this->cfg('product_id')) . ':' . $signature,
         ];
 
         if ($contentMd5 !== '') {

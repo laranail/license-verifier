@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Contracts\Console\Kernel;
 use Simtabi\Laranail\Licence\Verifier\Support\ReminderManager;
 
 it('exposes namespaced commands with license:* aliases', function (): void {
@@ -39,7 +39,7 @@ it('prints the device fingerprint as json', function (): void {
 });
 
 it('skips and clears the reminder via the command', function (): void {
-    config()->set('license-verifier.storage.path', sys_get_temp_dir().'/lv-cli-reminder-'.uniqid());
+    config()->set('license-verifier.storage.path', sys_get_temp_dir() . '/lv-cli-reminder-' . uniqid());
 
     $this->artisan('license:reminder skip --days=2')->assertSuccessful();
     expect(app(ReminderManager::class)->isSkipped())->toBeTrue();

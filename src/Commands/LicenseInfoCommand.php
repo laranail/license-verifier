@@ -44,7 +44,7 @@ final class LicenseInfoCommand extends Command
             $this->table(
                 ['Property', 'Value'],
                 [
-                    ['License Key', substr((string) $licenseKey, 0, 8).'...'],
+                    ['License Key', substr((string) $licenseKey, 0, 8) . '...'],
                     ['Status', $licenseInfo['status'] ?? 'N/A'],
                     ['Licensed To', $licenseInfo['licensed_to'] ?? 'N/A'],
                     ['Activated At', $licenseInfo['activated_at'] ?? 'N/A'],
@@ -66,7 +66,7 @@ final class LicenseInfoCommand extends Command
 
             return self::SUCCESS;
         } catch (Exception $e) {
-            $this->error('Failed to get license info: '.$e->getMessage());
+            $this->error('Failed to get license info: ' . $e->getMessage());
 
             return self::FAILURE;
         }

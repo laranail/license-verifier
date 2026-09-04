@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 use Override;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Simtabi\Laranail\Licence\Verifier\Database\Factories\LicenseRecordFactory;
 
 /**
@@ -56,12 +56,12 @@ class LicenseRecord extends Model
     protected function casts(): array
     {
         return [
-            'token' => 'encrypted',
-            'metadata' => 'encrypted:array',
-            'activated_at' => 'datetime',
+            'token'             => 'encrypted',
+            'metadata'          => 'encrypted:array',
+            'activated_at'      => 'datetime',
             'last_validated_at' => 'datetime',
             'last_heartbeat_at' => 'datetime',
-            'expires_at' => 'datetime',
+            'expires_at'        => 'datetime',
         ];
     }
 }

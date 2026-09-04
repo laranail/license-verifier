@@ -17,18 +17,18 @@ class LicenseRecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'key' => strtoupper($this->faker->bothify('????????-????????-????????-????????')),
-            'driver' => 'paseto',
-            'token' => null,
-            'fingerprint' => hash('sha256', $this->faker->uuid()),
-            'domain' => $this->faker->domainName(),
-            'licensed_to' => $this->faker->name(),
-            'status' => 'active',
-            'activated_at' => now(),
+            'key'               => strtoupper($this->faker->bothify('????????-????????-????????-????????')),
+            'driver'            => 'paseto',
+            'token'             => null,
+            'fingerprint'       => hash('sha256', $this->faker->uuid()),
+            'domain'            => $this->faker->domainName(),
+            'licensed_to'       => $this->faker->name(),
+            'status'            => 'active',
+            'activated_at'      => now(),
             'last_validated_at' => now(),
             'last_heartbeat_at' => now(),
-            'expires_at' => now()->addYear(),
-            'metadata' => [],
+            'expires_at'        => now()->addYear(),
+            'metadata'          => [],
         ];
     }
 }

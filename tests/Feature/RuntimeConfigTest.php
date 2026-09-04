@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
 use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
+use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
 it('verifies against a non-default driver at runtime via driver()', function (): void {
     config()->set('license-verifier.default', 'paseto'); // default stays paseto
