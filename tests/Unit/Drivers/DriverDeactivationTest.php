@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use Simtabi\Laranail\Licence\Verifier\Drivers\CryptolensDriver;
+use Illuminate\Http\Client\ConnectionException;
 use Simtabi\Laranail\Licence\Verifier\Drivers\FreemiusDriver;
+use Simtabi\Laranail\Licence\Verifier\Drivers\CryptolensDriver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\LicenseSpringDriver;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 

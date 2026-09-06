@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
 use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
-use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
+use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**

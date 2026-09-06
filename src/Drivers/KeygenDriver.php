@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -48,14 +48,14 @@ final class KeygenDriver extends AbstractHttpDriver
 
     public function health(): bool
     {
-        return $this->http()->get($this->base().'/ping')->status() !== 0;
+        return $this->http()->get($this->base() . '/ping')->status() !== 0;
     }
 
     private function validateKey(string $key, bool $persist): VerificationResult
     {
         $response = $this->http([
             'Content-Type' => 'application/vnd.api+json',
-        ])->post($this->base().'/licenses/actions/validate-key', [
+        ])->post($this->base() . '/licenses/actions/validate-key', [
             'meta' => ['key' => $key],
         ]);
 
@@ -74,9 +74,9 @@ final class KeygenDriver extends AbstractHttpDriver
 
         if ($persist) {
             $this->remember($key, [
-                'status' => 'active',
+                'status'     => 'active',
                 'expires_at' => $expiry,
-                'metadata' => ['entitlements' => (array) data_get($data, 'data.attributes.metadata', [])],
+                'metadata'   => ['entitlements' => (array) data_get($data, 'data.attributes.metadata', [])],
             ]);
         }
 

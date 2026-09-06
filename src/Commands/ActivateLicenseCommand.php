@@ -56,7 +56,7 @@ final class ActivateLicenseCommand extends Command
 
             return self::FAILURE;
         } catch (Exception $e) {
-            $this->error('Activation failed: '.$e->getMessage());
+            $this->error('Activation failed: ' . $e->getMessage());
 
             return self::FAILURE;
         }

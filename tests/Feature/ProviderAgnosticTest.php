@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Simtabi\Laranail\Licence\Verifier\Events\LicenseActivated;
 use Simtabi\Laranail\Licence\Verifier\Facades\LicenceVerifier;
@@ -36,7 +36,7 @@ it('uses the configured marketplace driver via the facade (Gumroad, not PASETO)'
     config()->set('license-verifier.storage.driver', 'database');
 
     Http::fake(['api.gumroad.com/*' => Http::response([
-        'success' => true,
+        'success'  => true,
         'purchase' => ['email' => 'buyer@example.com'],
     ])]);
 
@@ -54,7 +54,7 @@ it('dispatches lifecycle events for an HTTP driver (not just PASETO)', function 
     config()->set('license-verifier.storage.driver', 'database');
 
     Http::fake(['api.gumroad.com/*' => Http::response([
-        'success' => true,
+        'success'  => true,
         'purchase' => ['email' => 'buyer@example.com'],
     ])]);
 

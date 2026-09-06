@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Stores;
 
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Throwable;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
 /**
  * Stores license records in a Laravel cache store.
@@ -62,6 +62,6 @@ final readonly class CacheStore implements LicenseStore
     {
         $prefix = (string) config('license-verifier.cache.key_prefix', 'license-verifier');
 
-        return $prefix.':record:'.hash('sha256', $key);
+        return $prefix . ':record:' . hash('sha256', $key);
     }
 }

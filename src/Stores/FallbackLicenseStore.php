@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Stores;
 
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
-use PDOException;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 use Throwable;
+use PDOException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
 /**
  * Tiered, resilient {@see LicenseStore}: a chosen primary backend (database or
@@ -225,7 +225,7 @@ final readonly class FallbackLicenseStore implements LicenseStore
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     private function queuePut(string $key, array $data): void
     {
@@ -246,7 +246,8 @@ final readonly class FallbackLicenseStore implements LicenseStore
     /**
      * Tag a record's sync state for the mirror; stripped before callers see it.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
+     *
      * @return array<string, mixed>
      */
     private function withSynced(array $data, bool $synced = true): array
@@ -255,7 +256,8 @@ final readonly class FallbackLicenseStore implements LicenseStore
     }
 
     /**
-     * @param  array<string, mixed>|null  $data
+     * @param array<string, mixed>|null $data
+     *
      * @return array<string, mixed>|null
      */
     private function clean(?array $data): ?array
@@ -282,7 +284,7 @@ final readonly class FallbackLicenseStore implements LicenseStore
     }
 
     /**
-     * @param  array<int, string>  $keys
+     * @param array<int, string> $keys
      */
     private function setQueue(string $indexKey, array $keys): void
     {
@@ -318,7 +320,7 @@ final readonly class FallbackLicenseStore implements LicenseStore
         $cooldown = max(1, (int) config('license-verifier.storage.fallback_cooldown', 15));
         $this->fallback->put(self::BREAKER, ['down_until' => time() + $cooldown]);
 
-        Log::warning('license storage: primary unreachable ('.$e->getMessage()."); serving fallback for {$cooldown}s.");
+        Log::warning('license storage: primary unreachable (' . $e->getMessage() . "); serving fallback for {$cooldown}s.");
     }
 
     private function clearBreaker(): void

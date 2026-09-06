@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Client\PendingRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -25,9 +25,9 @@ final class UnlockShDriver extends AbstractHttpDriver
 
     public function activate(LicenseRequest $request): VerificationResult
     {
-        $response = $this->bearer()->post('/v1/licenses/'.rawurlencode($request->key).'/activate', array_filter([
+        $response = $this->bearer()->post('/v1/licenses/' . rawurlencode($request->key) . '/activate', array_filter([
             'fingerprint' => $request->fingerprint,
-            'name' => $request->client,
+            'name'        => $request->client,
         ]));
 
         return $this->result($response, $request->key, persist: true);
@@ -36,7 +36,7 @@ final class UnlockShDriver extends AbstractHttpDriver
     public function verify(?string $key = null): VerificationResult
     {
         $key ??= (string) config('license-verifier.license_key');
-        $response = $this->bearer()->post('/v1/licenses/'.rawurlencode($key).'/validate');
+        $response = $this->bearer()->post('/v1/licenses/' . rawurlencode($key) . '/validate');
 
         return $this->result($response, $key, persist: false);
     }
@@ -44,7 +44,7 @@ final class UnlockShDriver extends AbstractHttpDriver
     public function deactivate(?string $key = null, ?string $reason = null): bool
     {
         $key ??= (string) config('license-verifier.license_key');
-        $response = $this->bearer()->post('/v1/licenses/'.rawurlencode($key).'/deactivate');
+        $response = $this->bearer()->post('/v1/licenses/' . rawurlencode($key) . '/deactivate');
         $this->store()->forget($key);
 
         return $response->successful();

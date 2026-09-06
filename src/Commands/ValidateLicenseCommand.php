@@ -43,7 +43,7 @@ final class ValidateLicenseCommand extends Command
 
             return self::FAILURE;
         } catch (Exception $e) {
-            $this->error('Validation failed: '.$e->getMessage());
+            $this->error('Validation failed: ' . $e->getMessage());
 
             return self::FAILURE;
         }

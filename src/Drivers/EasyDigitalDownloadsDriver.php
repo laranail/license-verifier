@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
-use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Capabilities\SupportsDomainBinding;
 
 /**
  * Easy Digital Downloads — Software Licensing. Site-URL bound.
@@ -37,10 +37,10 @@ final class EasyDigitalDownloadsDriver extends AbstractHttpDriver implements Sup
         $key ??= (string) config('license-verifier.license_key');
         $response = $this->http()->get('/', array_filter([
             'edd_action' => 'deactivate_license',
-            'item_id' => $this->cfg('item_id'),
-            'item_name' => $this->cfg('item_name'),
-            'license' => $key,
-            'url' => rtrim((string) url('/'), '/'),
+            'item_id'    => $this->cfg('item_id'),
+            'item_name'  => $this->cfg('item_name'),
+            'license'    => $key,
+            'url'        => rtrim((string) url('/'), '/'),
         ]));
 
         $this->store()->forget($key);
@@ -69,10 +69,10 @@ final class EasyDigitalDownloadsDriver extends AbstractHttpDriver implements Sup
     {
         $response = $this->http()->get('/', array_filter([
             'edd_action' => $action,
-            'item_id' => $this->cfg('item_id'),
-            'item_name' => $this->cfg('item_name'),
-            'license' => $key,
-            'url' => rtrim((string) url('/'), '/'),
+            'item_id'    => $this->cfg('item_id'),
+            'item_name'  => $this->cfg('item_name'),
+            'license'    => $key,
+            'url'        => rtrim((string) url('/'), '/'),
         ]));
 
         $data = (array) $response->json();
@@ -88,9 +88,9 @@ final class EasyDigitalDownloadsDriver extends AbstractHttpDriver implements Sup
 
         if ($persist) {
             $this->remember($key, [
-                'status' => 'active',
-                'expires_at' => $data['expires'] ?? null,
-                'domain' => rtrim((string) url('/'), '/'),
+                'status'      => 'active',
+                'expires_at'  => $data['expires'] ?? null,
+                'domain'      => rtrim((string) url('/'), '/'),
                 'licensed_to' => $data['customer_name'] ?? null,
             ]);
         }

@@ -4,56 +4,56 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Licence\Verifier\Providers;
 
-use Composer\InstalledVersions;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Http\Kernel;
 use Override;
-use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
-use Simtabi\Laranail\Licence\Verifier\Commands\ActivateLicenseCommand;
+use Composer\InstalledVersions;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Console\Scheduling\Schedule;
+use Simtabi\Laranail\Package\Tools\Package;
+use Illuminate\Contracts\Foundation\Application;
+use Simtabi\Laranail\Licence\Verifier\Doctor\Checks;
+use Simtabi\Laranail\Licence\Verifier\LicenseManager;
+use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
+use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
+use Simtabi\Laranail\Licence\Verifier\Stores\CacheStore;
+use Simtabi\Laranail\Licence\Verifier\Commands\KeysCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\PingCommand;
+use Simtabi\Laranail\Licence\Verifier\Contracts\IpResolver;
+use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
+use Simtabi\Laranail\Package\Tools\Commands\InstallCommand;
 use Simtabi\Laranail\Licence\Verifier\Commands\ClearCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\DeactivateLicenseCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\SeatsCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\TokenCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\WatchCommand;
+use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
+use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
+use Simtabi\Laranail\Licence\Verifier\Bindings\DomainBinding;
 use Simtabi\Laranail\Licence\Verifier\Commands\DoctorCommand;
 use Simtabi\Laranail\Licence\Verifier\Commands\DriverCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\DriversCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\FingerprintCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\KeysCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\LicenseInfoCommand;
 use Simtabi\Laranail\Licence\Verifier\Commands\ManageCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\PingCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\RefreshLicenseCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\ReminderCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\SeatsCommand;
 use Simtabi\Laranail\Licence\Verifier\Commands\SourceCommand;
 use Simtabi\Laranail\Licence\Verifier\Commands\StatusCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\TokenCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\ValidateLicenseCommand;
-use Simtabi\Laranail\Licence\Verifier\Commands\WatchCommand;
-use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
-use Simtabi\Laranail\Licence\Verifier\Contracts\IpResolver;
-use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
-use Simtabi\Laranail\Licence\Verifier\Doctor\Checks;
-use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
-use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
-use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
-use Simtabi\Laranail\Licence\Verifier\LicenseManager;
-use Simtabi\Laranail\Licence\Verifier\Resolvers\ConfigKeyResolver;
-use Simtabi\Laranail\Licence\Verifier\Resolvers\ModelKeyResolver;
-use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
-use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
-use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
+use Simtabi\Laranail\Licence\Verifier\Commands\DriversCommand;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
-use Simtabi\Laranail\Licence\Verifier\Stores\CacheStore;
-use Simtabi\Laranail\Licence\Verifier\Stores\DatabaseStore;
-use Simtabi\Laranail\Licence\Verifier\Stores\FallbackLicenseStore;
-use Simtabi\Laranail\Licence\Verifier\Stores\FileStore;
-use Simtabi\Laranail\Licence\Verifier\Support\ConnectionChecker;
 use Simtabi\Laranail\Licence\Verifier\Support\ReminderManager;
+use Simtabi\Laranail\Licence\Verifier\Commands\ReminderCommand;
+use Simtabi\Laranail\Licence\Verifier\Support\ConnectionChecker;
+use Simtabi\Laranail\Licence\Verifier\Resolvers\ModelKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Commands\FingerprintCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\LicenseInfoCommand;
+use Simtabi\Laranail\Licence\Verifier\Resolvers\ConfigKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
+use Simtabi\Laranail\Licence\Verifier\Stores\FallbackLicenseStore;
+use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseKeyResolver;
+use Simtabi\Laranail\Licence\Verifier\Http\Middleware\CheckLicense;
 use Simtabi\Laranail\Licence\Verifier\Support\ThirdPartyIpResolver;
-use Simtabi\Laranail\Package\Tools\Commands\InstallCommand;
-use Simtabi\Laranail\Package\Tools\Package;
+use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
+use Simtabi\Laranail\Licence\Verifier\Commands\RefreshLicenseCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\ActivateLicenseCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\ValidateLicenseCommand;
+use Simtabi\Laranail\Licence\Verifier\Commands\DeactivateLicenseCommand;
 use Simtabi\Laranail\Package\Tools\Support\Definitions\AboutSectionDefinition;
 
 final class LicenceVerifierServiceProvider extends PackageServiceProvider
@@ -186,7 +186,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
     {
         return match ($driver) {
             'database' => new DatabaseStore,
-            'cache' => new CacheStore,
+            'cache'    => new CacheStore,
             'callback' => $app->bound('license-verifier.store')
                 ? $app->make('license-verifier.store')
                 : new FileStore,
@@ -200,7 +200,7 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
     private function registerKeyResolver(): void
     {
         $this->app->singleton(LicenseKeyResolver::class, static fn ($app): LicenseKeyResolver => match ((string) config('license-verifier.source', 'config')) {
-            'model' => new ModelKeyResolver,
+            'model'    => new ModelKeyResolver,
             'callback' => $app->bound('license-verifier.resolver')
                 ? $app->make('license-verifier.resolver')
                 : new ConfigKeyResolver,

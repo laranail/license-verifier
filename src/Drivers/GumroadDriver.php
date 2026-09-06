@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Licence\Verifier\Drivers;
 
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseInfo;
-use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseStatus;
+use Simtabi\Laranail\Licence\Verifier\ValueObjects\LicenseRequest;
 use Simtabi\Laranail\Licence\Verifier\ValueObjects\VerificationResult;
 
 /**
@@ -39,8 +39,8 @@ final class GumroadDriver extends AbstractHttpDriver
 
         $response = $this->http()->asForm()->post('/v2/licenses/decrement_uses_count', [
             'access_token' => $this->cfg('access_token'),
-            'product_id' => $this->cfg('product_id'),
-            'license_key' => $key,
+            'product_id'   => $this->cfg('product_id'),
+            'license_key'  => $key,
         ]);
 
         $this->store()->forget($key);
@@ -63,9 +63,9 @@ final class GumroadDriver extends AbstractHttpDriver
     private function check(string $key, bool $incrementUses): VerificationResult
     {
         $payload = array_filter([
-            'product_id' => $this->cfg('product_id'),
-            'product_permalink' => $this->cfg('product_permalink'),
-            'license_key' => $key,
+            'product_id'           => $this->cfg('product_id'),
+            'product_permalink'    => $this->cfg('product_permalink'),
+            'license_key'          => $key,
             'increment_uses_count' => $incrementUses ? 'true' : 'false',
         ], static fn ($v): bool => $v !== null);
 
@@ -89,9 +89,9 @@ final class GumroadDriver extends AbstractHttpDriver
         }
 
         $this->remember($key, [
-            'status' => 'active',
+            'status'      => 'active',
             'licensed_to' => $purchase['email'] ?? null,
-            'metadata' => ['uses' => $data['uses'] ?? null],
+            'metadata'    => ['uses' => $data['uses'] ?? null],
         ]);
 
         return VerificationResult::valid(
