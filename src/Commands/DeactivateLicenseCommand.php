@@ -13,9 +13,6 @@ final class DeactivateLicenseCommand extends Command
 
     protected $description = 'Deactivate a license key';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:deactivate'];
-
     public function handle(LicenseManager $manager): int
     {
         $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');

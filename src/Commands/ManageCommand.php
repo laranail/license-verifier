@@ -19,9 +19,6 @@ final class ManageCommand extends Command
 
     protected $description = 'Interactive license management dashboard (TUI)';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license', 'license:manage'];
-
     public function handle(): int
     {
         if ($this->services->interaction()->isNonInteractive()) {

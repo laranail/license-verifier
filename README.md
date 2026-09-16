@@ -42,8 +42,8 @@ LicenseVerifier::getLicenseInfo();
 Gate routes with the `license` middleware, or gate deploys from the CLI:
 
 ```bash
-php artisan license:manage          # interactive TUI dashboard
-php artisan license:status --strict --json   # CI gate (exit 0 valid / 1 invalid / 2 unreachable)
+php artisan laranail::license-verifier.manage          # interactive TUI dashboard
+php artisan laranail::license-verifier.status --strict --json   # CI gate (exit 0 valid / 1 invalid / 2 unreachable)
 ```
 
 Full tour: [Getting started](docs/getting-started.md).
@@ -75,7 +75,7 @@ Full documentation is at **[opensource.simtabi.com/documentation/laranail/licens
 
 - [Drivers](docs/tools/drivers.md) — the 14 drivers, capability matrix, generic and custom drivers.
 - [CLI](docs/tools/cli.md) — all `laranail::license-verifier.*` / `license:*` commands and exit codes.
-- [TUI dashboard](docs/tools/tui.md) — the interactive `license:manage` dashboard.
+- [TUI dashboard](docs/tools/tui.md) — the interactive `laranail::license-verifier.manage` dashboard.
 
 ### Project
 

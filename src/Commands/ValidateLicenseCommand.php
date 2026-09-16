@@ -13,9 +13,6 @@ final class ValidateLicenseCommand extends Command
 
     protected $description = 'Validate a license';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:validate'];
-
     public function handle(LicenseManager $manager): int
     {
         $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');

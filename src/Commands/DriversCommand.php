@@ -15,9 +15,6 @@ final class DriversCommand extends Command
 
     protected $description = 'List available license drivers and their capabilities';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:drivers'];
-
     public function handle(): int
     {
         $default = $this->manager()->getDefaultDriver();

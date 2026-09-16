@@ -16,10 +16,10 @@ Pick the driver and credentials in `.env` (see [Installation](installation.md)).
 
 ## 2. Activate
 
-From the CLI (or the [TUI dashboard](tools/tui.md), `php artisan license:manage`):
+From the CLI (or the [TUI dashboard](tools/tui.md), `php artisan laranail::license-verifier.manage`):
 
 ```bash
-php artisan license:activate YOUR-LICENSE-KEY
+php artisan laranail::license-verifier.activate YOUR-LICENSE-KEY
 ```
 
 Or from code:
@@ -62,16 +62,16 @@ Or auto-apply it to whole groups via `license-verifier.middleware_groups`.
 
 ## 5. Gate deploys
 
-`license:status` returns CI-friendly exit codes (`0` valid / `1` invalid / `2` unreachable):
+`laranail::license-verifier.status` returns CI-friendly exit codes (`0` valid / `1` invalid / `2` unreachable):
 
 ```bash
-php artisan license:status --strict --json   # block a deploy when unlicensed
+php artisan laranail::license-verifier.status --strict --json   # block a deploy when unlicensed
 ```
 
 ## Next steps
 
 - [CLI reference](tools/cli.md) — all `laranail::license-verifier.*` / `license:*` commands.
-- [TUI dashboard](tools/tui.md) — the interactive `license:manage` dashboard.
+- [TUI dashboard](tools/tui.md) — the interactive `laranail::license-verifier.manage` dashboard.
 - [Drivers](tools/drivers.md) — the provider matrix, capabilities, and custom drivers.
 - [Configuration](configuration.md) — source, storage, cache, heartbeat, bindings, security.
 - [Architecture](architecture.md) — how the orchestrator, drivers, and stores fit together.

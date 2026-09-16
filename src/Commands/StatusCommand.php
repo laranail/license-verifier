@@ -17,9 +17,6 @@ final class StatusCommand extends Command
 
     protected $description = 'Show the current license status (exit code reflects validity)';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:status'];
-
     public function handle(): int
     {
         $result = $this->driver()->verify();

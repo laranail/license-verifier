@@ -10,9 +10,6 @@ final class DriverCommand extends Command
 
     protected $description = 'Inspect (and optionally health-test) a license driver';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:driver'];
-
     public function handle(): int
     {
         $name = (string) ($this->argument('name') ?: $this->manager()->getDefaultDriver());

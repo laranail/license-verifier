@@ -15,9 +15,6 @@ final class SeatsCommand extends Command
 
     protected $description = 'List or revoke the seats/machines registered to the license';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:seats'];
-
     public function handle(): int
     {
         $manager = $this->laravel->make(LicenseManager::class);

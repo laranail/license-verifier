@@ -13,51 +13,51 @@ support `--json` where noted, and return CI-friendly exit codes.
 
 | Command | Alias | Notes |
 |---|---|---|
-| `…​.activate {key?}` | `license:activate` | Activates; prints license table. |
-| `…​.deactivate` | `license:deactivate` | Confirms, then releases the activation. |
-| `…​.validate` | `license:validate` | Offline validity check; warns when expiring soon. |
-| `…​.refresh` | `license:refresh` | Pulls a fresh token (drivers that support it). |
-| `…​.info` | `license:info` | Full license detail table. |
-| `…​.status {--strict} {--json}` | `license:status` | **CI gate** — exit code reflects validity. |
+| `…​.activate {key?}` | `laranail::license-verifier.activate` | Activates; prints license table. |
+| `…​.deactivate` | `laranail::license-verifier.deactivate` | Confirms, then releases the activation. |
+| `…​.validate` | `laranail::license-verifier.validate` | Offline validity check; warns when expiring soon. |
+| `…​.refresh` | `laranail::license-verifier.refresh` | Pulls a fresh token (drivers that support it). |
+| `…​.info` | `laranail::license-verifier.info` | Full license detail table. |
+| `…​.status {--strict} {--json}` | `laranail::license-verifier.status` | **CI gate** — exit code reflects validity. |
 
 ```bash
-php artisan license:status --strict --json   # block a deploy when unlicensed
+php artisan laranail::license-verifier.status --strict --json   # block a deploy when unlicensed
 ```
 
 ## Interactive
 
 | Command | Alias | Notes |
 |---|---|---|
-| `…​.manage` | `license`, `license:manage` | TUI dashboard: status panel + action menu. Non-TTY → `status`. |
+| `…​.manage` | `license`, `laranail::license-verifier.manage` | TUI dashboard: status panel + action menu. Non-TTY → `status`. |
 
 ## Drivers, source & diagnostics
 
 | Command | Alias | Notes |
 |---|---|---|
-| `…​.drivers {--json}` | `license:drivers` | Capability table of all drivers (active marked). |
-| `…​.driver {name?} {--test} {--json}` | `license:driver` | Inspect one driver (capabilities; `--test` pings health). |
-| `…​.source {--json}` | `license:source` | Show the configured license-detail source + storage. |
-| `…​.fingerprint {--json}` | `license:fingerprint` | Device fingerprint + metadata. |
-| `…​.ping {--fresh} {--json}` | `license:ping`, `license:check-connection` | Cached server reachability. |
-| `…​.doctor {--json} {--strict}` | `license:doctor` | Config diagnostics (driver, keys, storage/fallback, sodium). |
-| `…​.reminder {action} {--days=}` | `license:reminder` | `skip` / `clear` / `status`. |
+| `…​.drivers {--json}` | `laranail::license-verifier.drivers` | Capability table of all drivers (active marked). |
+| `…​.driver {name?} {--test} {--json}` | `laranail::license-verifier.driver` | Inspect one driver (capabilities; `--test` pings health). |
+| `…​.source {--json}` | `laranail::license-verifier.source` | Show the configured license-detail source + storage. |
+| `…​.fingerprint {--json}` | `laranail::license-verifier.fingerprint` | Device fingerprint + metadata. |
+| `…​.ping {--fresh} {--json}` | `laranail::license-verifier.ping`, `laranail::license-verifier.ping` | Cached server reachability. |
+| `…​.doctor {--json} {--strict}` | `laranail::license-verifier.doctor` | Config diagnostics (driver, keys, storage/fallback, sodium). |
+| `…​.reminder {action} {--days=}` | `laranail::license-verifier.reminder` | `skip` / `clear` / `status`. |
 
 ## Storage, seats & maintenance
 
 | Command | Alias | Notes |
 |---|---|---|
-| `…​.seats {action=list} {target?} {--json}` | `license:seats` | `list` / `revoke` seats (drivers supporting seat management). |
-| `…​.token {action} {path?}` | `license:token` | `show` / `export` / `import` the offline token (air-gap). |
-| `…​.keys {--json}` | `license:keys` | Show the stored PASETO public-key bundle. |
-| `…​.clear {--force}` | `license:clear` | Wipe locally stored license data for this app. |
-| `…​.watch {--cycles=} {--interval=}` | `license:watch` | Live status dashboard, refreshing on an interval. |
+| `…​.seats {action=list} {target?} {--json}` | `laranail::license-verifier.seats` | `list` / `revoke` seats (drivers supporting seat management). |
+| `…​.token {action} {path?}` | `laranail::license-verifier.token` | `show` / `export` / `import` the offline token (air-gap). |
+| `…​.keys {--json}` | `laranail::license-verifier.keys` | Show the stored PASETO public-key bundle. |
+| `…​.clear {--force}` | `laranail::license-verifier.clear` | Wipe locally stored license data for this app. |
+| `…​.watch {--cycles=} {--interval=}` | `laranail::license-verifier.watch` | Live status dashboard, refreshing on an interval. |
 
 ## Scripting
 
 `--json` emits machine-readable output; combine with the exit code in CI:
 
 ```bash
-if ! php artisan license:status --strict; then
+if ! php artisan laranail::license-verifier.status --strict; then
   echo "License invalid — aborting." && exit 1
 fi
 ```

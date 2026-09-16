@@ -17,9 +17,6 @@ final class TokenCommand extends Command
 
     protected $description = 'Show, export or import the offline license token';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:token'];
-
     public function handle(TokenStorage $storage, LicenseKeyResolver $resolver): int
     {
         $key = $resolver->resolve() ?? (string) config('license-verifier.license_key');
@@ -89,7 +86,7 @@ final class TokenCommand extends Command
 
         $storage->store(trim(File::get($path)), $key);
 
-        $this->services->display()->success('Token imported. Run "license:validate" to confirm.');
+        $this->services->display()->success('Token imported. Run "laranail::license-verifier.validate" to confirm.');
 
         return self::SUCCESS;
     }

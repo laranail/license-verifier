@@ -15,24 +15,24 @@ it('exposes namespaced commands with license:* aliases', function (): void {
 });
 
 it('status returns a failing exit code when unactivated', function (): void {
-    $this->artisan('license:status')->assertExitCode(1);
+    $this->artisan('laranail::license-verifier.status')->assertExitCode(1);
 });
 
 it('status emits json when asked', function (): void {
-    $code = Artisan::call('license:status', ['--json' => true]);
+    $code = Artisan::call('laranail::license-verifier.status', ['--json' => true]);
 
     expect($code)->toBe(1)
         ->and(Artisan::output())->toContain('"status"');
 });
 
 it('lists drivers with capabilities', function (): void {
-    Artisan::call('license:drivers');
+    Artisan::call('laranail::license-verifier.drivers');
 
     expect(Artisan::output())->toContain('paseto');
 });
 
 it('prints the device fingerprint as json', function (): void {
-    $code = Artisan::call('license:fingerprint', ['--json' => true]);
+    $code = Artisan::call('laranail::license-verifier.fingerprint', ['--json' => true]);
 
     expect($code)->toBe(0)
         ->and(Artisan::output())->toContain('"fingerprint"');
@@ -41,13 +41,13 @@ it('prints the device fingerprint as json', function (): void {
 it('skips and clears the reminder via the command', function (): void {
     config()->set('license-verifier.storage.path', sys_get_temp_dir() . '/lv-cli-reminder-' . uniqid());
 
-    $this->artisan('license:reminder skip --days=2')->assertSuccessful();
+    $this->artisan('laranail::license-verifier.reminder skip --days=2')->assertSuccessful();
     expect(app(ReminderManager::class)->isSkipped())->toBeTrue();
 
-    $this->artisan('license:reminder clear')->assertSuccessful();
+    $this->artisan('laranail::license-verifier.reminder clear')->assertSuccessful();
     expect(app(ReminderManager::class)->isSkipped())->toBeFalse();
 });
 
 it('runs doctor diagnostics', function (): void {
-    $this->artisan('license:doctor')->assertExitCode(0);
+    $this->artisan('laranail::license-verifier.doctor')->assertExitCode(0);
 });
