@@ -15,7 +15,7 @@ final class LicenseInfoCommand extends Command
 
     public function handle(LicenseManager $manager): int
     {
-        $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');
+        $licenseKey = $this->strArgOrNull('key') ?? config('license-verifier.license_key');
 
         if (! $licenseKey) {
             $this->error('License key is required');

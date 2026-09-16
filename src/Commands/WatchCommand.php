@@ -16,8 +16,8 @@ final class WatchCommand extends Command
 
     public function handle(): int
     {
-        $interval = max(1, (int) $this->option('interval'));
-        $cycles = $this->option('cycles') !== null ? (int) $this->option('cycles') : null;
+        $interval = max(1, $this->intOption('interval', 5));
+        $cycles = $this->intOption('cycles');
 
         if ($this->services->interaction()->isNonInteractive() && $cycles === null) {
             $this->renderSnapshot();

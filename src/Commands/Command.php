@@ -9,6 +9,7 @@ use Simtabi\Laranail\Licence\Verifier\Contracts\Driver;
 use Simtabi\Laranail\Licence\Verifier\Drivers\DriverManager;
 use Simtabi\Laranail\Console\Tools\Commands\Command as ConsoleCommand;
 use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Simtabi\Laranail\Package\Tools\Commands\Concerns\ReadsOptions;
 
 /**
  * Base command for the license-verifier CLI/TUI suite. Provides the laranail
@@ -17,6 +18,7 @@ use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
  */
 abstract class Command extends ConsoleCommand
 {
+    use ReadsOptions;
     use SupportsNamespacedNames;
 
     protected function manager(): DriverManager
