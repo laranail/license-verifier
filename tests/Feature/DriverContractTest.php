@@ -32,7 +32,7 @@ it('offers drivers in its config, so this guard is not vacuous', function (): vo
 });
 
 it('has a create method for every driver the config offers', function (): void {
-    $manager  = new ReflectionClass(DriverManager::class);
+    $manager = new ReflectionClass(DriverManager::class);
     $offenders = [];
 
     foreach (licenseVerifierDriverKeys() as $key) {
