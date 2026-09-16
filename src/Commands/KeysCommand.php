@@ -15,9 +15,6 @@ final class KeysCommand extends Command
 
     protected $description = 'Show the configured public key and stored key bundle';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:keys'];
-
     public function handle(TokenStorage $storage): int
     {
         $public = (string) config('license-verifier.public_key');

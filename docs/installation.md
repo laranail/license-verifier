@@ -45,7 +45,7 @@ LICENSE_VERIFIER_KEY=YOUR-LICENSE-KEY
 ```
 
 Every key is described in [Configuration](configuration.md); the per-provider blocks are in
-[Drivers](tools/drivers.md). Verify the setup with `php artisan license:doctor`.
+[Drivers](tools/drivers.md). Verify the setup with `php artisan laranail::license-verifier.doctor`.
 
 ## Upgrading
 

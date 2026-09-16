@@ -20,7 +20,7 @@ it('can activate a license via command', function (): void {
     $manager->shouldReceive('getLicenseInfo')->with('TEST-LICENSE-KEY')->once()
         ->andReturn(['status' => 'active', 'licensed_to' => 'Acme', 'expires_at' => '2027-12-31', 'seats_total' => 5]);
 
-    $this->artisan('license:activate', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.activate', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsOutput('Activating license...')
         ->expectsOutput('License activated successfully!')
         ->expectsTable(['Property', 'Value'], [
@@ -35,7 +35,7 @@ it('can activate a license via command', function (): void {
 it('can deactivate a license via command', function (): void {
     mockManager()->shouldReceive('deactivate')->with('TEST-LICENSE-KEY')->once()->andReturnTrue();
 
-    $this->artisan('license:deactivate', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.deactivate', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsQuestion('Are you sure you want to deactivate this license?', true)
         ->expectsOutput('Deactivating license...')
         ->expectsOutput('License deactivated successfully!')
@@ -45,7 +45,7 @@ it('can deactivate a license via command', function (): void {
 it('can refresh a license via command', function (): void {
     mockManager()->shouldReceive('refresh')->with('TEST-LICENSE-KEY')->once()->andReturnTrue();
 
-    $this->artisan('license:refresh', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.refresh', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsOutput('Refreshing license token...')
         ->expectsOutput('License token refreshed successfully!')
         ->assertSuccessful();
@@ -56,7 +56,7 @@ it('can validate a license via command', function (): void {
     $manager->shouldReceive('isValid')->with('TEST-LICENSE-KEY')->once()->andReturnTrue();
     $manager->shouldReceive('isExpiringSoon')->with(7, 'TEST-LICENSE-KEY')->once()->andReturnFalse();
 
-    $this->artisan('license:validate', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.validate', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsOutput('Validating license...')
         ->expectsOutput('✓ License is valid')
         ->assertSuccessful();
@@ -67,7 +67,7 @@ it('warns when license is expiring soon', function (): void {
     $manager->shouldReceive('isValid')->with('TEST-LICENSE-KEY')->once()->andReturnTrue();
     $manager->shouldReceive('isExpiringSoon')->with(7, 'TEST-LICENSE-KEY')->once()->andReturnTrue();
 
-    $this->artisan('license:validate', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.validate', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsOutput('✓ License is valid')
         ->expectsOutput('⚠ License is expiring soon!')
         ->assertSuccessful();
@@ -80,7 +80,7 @@ it('can display license information via command', function (): void {
     $manager->shouldReceive('isExpiringSoon')->with(7, 'TEST-LICENSE-KEY')->once()->andReturnFalse();
     $manager->shouldReceive('requiresOnlineRefresh')->with('TEST-LICENSE-KEY')->once()->andReturnFalse();
 
-    $this->artisan('license:info', ['key' => 'TEST-LICENSE-KEY'])
+    $this->artisan('laranail::license-verifier.info', ['key' => 'TEST-LICENSE-KEY'])
         ->expectsOutput('License Information:')
         ->expectsTable(['Property', 'Value'], [
             ['License Key', 'TEST-LIC...'],
@@ -98,7 +98,7 @@ it('handles activation failure via command', function (): void {
     mockManager()->shouldReceive('activate')->with('INVALID-KEY')->once()
         ->andThrow(new Exception('Invalid license key'));
 
-    $this->artisan('license:activate', ['key' => 'INVALID-KEY'])
+    $this->artisan('laranail::license-verifier.activate', ['key' => 'INVALID-KEY'])
         ->expectsOutput('Activation failed: Invalid license key')
         ->assertFailed();
 });
@@ -109,7 +109,7 @@ it('prompts for license key when not provided', function (): void {
     $manager->shouldReceive('activate')->with('PROMPTED-KEY')->once()->andReturn(VerificationResult::valid());
     $manager->shouldReceive('getLicenseInfo')->with('PROMPTED-KEY')->once()->andReturn([]);
 
-    $this->artisan('license:activate')
+    $this->artisan('laranail::license-verifier.activate')
         ->expectsQuestion('Please enter your license key', 'PROMPTED-KEY')
         ->expectsOutput('License activated successfully!')
         ->assertSuccessful();
@@ -118,7 +118,7 @@ it('prompts for license key when not provided', function (): void {
 it('shows error when deactivation fails', function (): void {
     mockManager()->shouldReceive('deactivate')->once()->andReturnFalse();
 
-    $this->artisan('license:deactivate', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.deactivate', ['key' => 'TEST-KEY'])
         ->expectsQuestion('Are you sure you want to deactivate this license?', true)
         ->expectsOutput('Failed to deactivate license')
         ->assertFailed();
@@ -127,7 +127,7 @@ it('shows error when deactivation fails', function (): void {
 it('cancels deactivation when user declines', function (): void {
     mockManager()->shouldNotReceive('deactivate');
 
-    $this->artisan('license:deactivate', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.deactivate', ['key' => 'TEST-KEY'])
         ->expectsQuestion('Are you sure you want to deactivate this license?', false)
         ->expectsOutput('Deactivation cancelled')
         ->assertSuccessful();
@@ -136,7 +136,7 @@ it('cancels deactivation when user declines', function (): void {
 it('shows error when refresh fails', function (): void {
     mockManager()->shouldReceive('refresh')->once()->andReturnFalse();
 
-    $this->artisan('license:refresh', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.refresh', ['key' => 'TEST-KEY'])
         ->expectsOutput('Failed to refresh license token')
         ->assertFailed();
 });
@@ -144,7 +144,7 @@ it('shows error when refresh fails', function (): void {
 it('shows error when validation fails', function (): void {
     mockManager()->shouldReceive('isValid')->once()->andReturnFalse();
 
-    $this->artisan('license:validate', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.validate', ['key' => 'TEST-KEY'])
         ->expectsOutput('✗ License is invalid')
         ->assertFailed();
 });
@@ -152,7 +152,7 @@ it('shows error when validation fails', function (): void {
 it('shows error when no license key for validation', function (): void {
     config(['license-verifier.license_key' => null]);
 
-    $this->artisan('license:validate')
+    $this->artisan('laranail::license-verifier.validate')
         ->expectsOutput('License key is required')
         ->assertFailed();
 });
@@ -160,7 +160,7 @@ it('shows error when no license key for validation', function (): void {
 it('shows error when no license info available', function (): void {
     mockManager()->shouldReceive('getLicenseInfo')->once()->andReturn([]);
 
-    $this->artisan('license:info', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.info', ['key' => 'TEST-KEY'])
         ->expectsOutput('No license information available. Please activate the license first.')
         ->assertFailed();
 });
@@ -171,7 +171,7 @@ it('shows online refresh warning in license info', function (): void {
     $manager->shouldReceive('isExpiringSoon')->once()->andReturnFalse();
     $manager->shouldReceive('requiresOnlineRefresh')->once()->andReturnTrue();
 
-    $this->artisan('license:info', ['key' => 'TEST-KEY'])
+    $this->artisan('laranail::license-verifier.info', ['key' => 'TEST-KEY'])
         ->expectsOutput('Warning: Online refresh is required!')
         ->assertSuccessful();
 });
@@ -182,7 +182,7 @@ it('uses configured license key when not provided as argument', function (): voi
     $manager->shouldReceive('isValid')->with('CONFIG-KEY')->once()->andReturnTrue();
     $manager->shouldReceive('isExpiringSoon')->with(7, 'CONFIG-KEY')->once()->andReturnFalse();
 
-    $this->artisan('license:validate')
+    $this->artisan('laranail::license-verifier.validate')
         ->expectsOutput('✓ License is valid')
         ->assertSuccessful();
 });

@@ -13,9 +13,6 @@ final class LicenseInfoCommand extends Command
 
     protected $description = 'Display license information';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:info'];
-
     public function handle(LicenseManager $manager): int
     {
         $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');

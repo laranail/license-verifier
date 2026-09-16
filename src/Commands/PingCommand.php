@@ -15,9 +15,6 @@ final class PingCommand extends Command
 
     protected $description = 'Check whether the license server is reachable';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:ping', 'license:check-connection'];
-
     public function handle(ConnectionChecker $connection): int
     {
         $fresh = (bool) $this->option('fresh');

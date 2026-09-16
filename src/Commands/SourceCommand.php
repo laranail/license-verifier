@@ -12,9 +12,6 @@ final class SourceCommand extends Command
 
     protected $description = 'Show where the license key/details are resolved from';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:source'];
-
     public function handle(LicenseKeyResolver $resolver): int
     {
         $key = $resolver->resolve();

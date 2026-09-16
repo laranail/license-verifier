@@ -13,9 +13,6 @@ final class RefreshLicenseCommand extends Command
 
     protected $description = 'Refresh a license token';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:refresh'];
-
     public function handle(LicenseManager $manager): int
     {
         $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');

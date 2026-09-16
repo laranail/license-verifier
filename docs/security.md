@@ -68,7 +68,7 @@ Security invariants:
 - **Circuit breaker** (`storage.fallback_cooldown`, default 15s) avoids paying the connection
   timeout on every request while the primary is down.
 - **Pending write-back**: a write made during an outage is reconciled to the primary on
-  recovery; `license:doctor` surfaces "serving local fallback" + the pending-sync count.
+  recovery; `laranail::license-verifier.doctor` surfaces "serving local fallback" + the pending-sync count.
 - The fallback **cannot extend trust** — the PASETO token's own `exp` and the grace window
   still bound offline operation.
 

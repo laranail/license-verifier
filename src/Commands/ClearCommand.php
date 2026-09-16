@@ -13,9 +13,6 @@ final class ClearCommand extends Command
 
     protected $description = 'Wipe all locally stored license data';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:clear'];
-
     public function handle(LicenceVerifier $engine, LicenseStore $store): int
     {
         if (! $this->option('force') && ! $this->services->interaction()->askConfirm('Wipe all stored license data?')) {

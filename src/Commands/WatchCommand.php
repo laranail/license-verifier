@@ -14,9 +14,6 @@ final class WatchCommand extends Command
 
     protected $description = 'Live license status dashboard';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:watch'];
-
     public function handle(): int
     {
         $interval = max(1, (int) $this->option('interval'));

@@ -15,9 +15,6 @@ final class ReminderCommand extends Command
 
     protected $description = 'Skip, clear or inspect the license reminder';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:reminder'];
-
     public function handle(ReminderManager $reminder): int
     {
         $action = (string) $this->argument('action');

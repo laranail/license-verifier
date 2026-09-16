@@ -13,9 +13,6 @@ final class ActivateLicenseCommand extends Command
 
     protected $description = 'Activate a license key';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:activate'];
-
     public function handle(LicenseManager $manager): int
     {
         $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');

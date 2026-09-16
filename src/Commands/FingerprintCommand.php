@@ -15,9 +15,6 @@ final class FingerprintCommand extends Command
 
     protected $description = 'Show this device fingerprint and environment metadata';
 
-    /** @var list<string> */
-    protected array $commandAliases = ['license:fingerprint'];
-
     public function handle(FingerprintGenerator $fingerprints): int
     {
         $fingerprint = $fingerprints->generate();

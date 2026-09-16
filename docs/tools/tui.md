@@ -1,6 +1,6 @@
 # TUI dashboard
 
-`php artisan license:manage` (aliases `license`, `license:manage`) opens an interactive
+`php artisan laranail::license-verifier.manage` (aliases `license`, `laranail::license-verifier.manage`) opens an interactive
 license-management dashboard built on `laranail/console`.
 
 ## What it shows

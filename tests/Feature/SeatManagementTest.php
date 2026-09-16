@@ -51,7 +51,7 @@ it('runs the seats list command (json)', function (): void {
         'data'    => ['usages' => [['id' => 7, 'fingerprint' => 'fp-xyz', 'status' => 'active']], 'total' => 1],
     ])]);
 
-    Artisan::call('license:seats', ['action' => 'list', '--json' => true]);
+    Artisan::call('laranail::license-verifier.seats', ['action' => 'list', '--json' => true]);
 
     expect(Artisan::output())->toContain('fp-xyz');
 });
@@ -61,7 +61,7 @@ it('refuses seat management for a driver that does not support it', function ():
 
     expect(app(LicenseManager::class)->supportsSeatManagement())->toBeFalse();
 
-    Artisan::call('license:seats', ['action' => 'list']);
+    Artisan::call('laranail::license-verifier.seats', ['action' => 'list']);
 
     expect(Artisan::output())->toContain('does not support seat management');
 });

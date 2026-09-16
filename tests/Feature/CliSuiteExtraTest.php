@@ -10,19 +10,19 @@ it('shows the configured source', function (): void {
     config()->set('license-verifier.source', 'config');
     config()->set('license-verifier.license_key', 'ABCD-1234-EFGH-5678');
 
-    Artisan::call('license:source', ['--json' => true]);
+    Artisan::call('laranail::license-verifier.source', ['--json' => true]);
 
     expect(Artisan::output())->toContain('"source"');
 });
 
 it('inspects a driver and its capabilities', function (): void {
-    Artisan::call('license:driver', ['name' => 'paseto', '--json' => true]);
+    Artisan::call('laranail::license-verifier.driver', ['name' => 'paseto', '--json' => true]);
 
     expect(Artisan::output())->toContain('"capabilities"');
 });
 
 it('lists drivers with capabilities (json content)', function (): void {
-    Artisan::call('license:drivers', ['--json' => true]);
+    Artisan::call('laranail::license-verifier.drivers', ['--json' => true]);
 
     expect(Artisan::output())
         ->toContain('paseto')
@@ -30,7 +30,7 @@ it('lists drivers with capabilities (json content)', function (): void {
 });
 
 it('reports doctor diagnostics (json content)', function (): void {
-    Artisan::call('license:doctor', ['--json' => true]);
+    Artisan::call('laranail::license-verifier.doctor', ['--json' => true]);
 
     expect(Artisan::output())
         ->toContain('license-verifier:driver')
@@ -38,11 +38,11 @@ it('reports doctor diagnostics (json content)', function (): void {
 });
 
 it('clears stored license data with --force', function (): void {
-    $this->artisan('license:clear --force')->assertSuccessful();
+    $this->artisan('laranail::license-verifier.clear --force')->assertSuccessful();
 });
 
 it('runs the watch dashboard for a fixed number of cycles', function (): void {
-    $this->artisan('license:watch --cycles=1 --interval=1')->assertSuccessful();
+    $this->artisan('laranail::license-verifier.watch --cycles=1 --interval=1')->assertSuccessful();
 });
 
 it('exports and re-imports the offline token (air-gap round-trip)', function (): void {
@@ -55,14 +55,14 @@ it('exports and re-imports the offline token (air-gap round-trip)', function ():
 
     $path = sys_get_temp_dir() . '/lv-token-' . uniqid() . '.token';
 
-    $this->artisan("license:token export {$path}")->assertSuccessful();
+    $this->artisan("laranail::license-verifier.token export {$path}")->assertSuccessful();
     expect(File::exists($path))->toBeTrue();
 
     // Wipe and re-import.
     $storage->delete('OFFLINE-KEY');
     expect($storage->retrieve('OFFLINE-KEY'))->toBeNull();
 
-    $this->artisan("license:token import {$path}")->assertSuccessful();
+    $this->artisan("laranail::license-verifier.token import {$path}")->assertSuccessful();
     expect($storage->retrieve('OFFLINE-KEY'))->toBe('THE-OFFLINE-TOKEN');
 
     File::delete($path);
