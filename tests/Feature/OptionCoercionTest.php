@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Carbon\Carbon;
 use Simtabi\Laranail\Licence\Verifier\Support\ReminderManager;
 use Simtabi\Laranail\Package\Tools\Testing\AssertsDriverContract;
+use Simtabi\Laranail\Licence\Verifier\Commands\LicenseInfoCommand;
 use Simtabi\Laranail\Package\Tools\Commands\Concerns\ReadsOptions;
 use Simtabi\Laranail\Licence\Verifier\Commands\Command as VerifierCommand;
 
@@ -79,7 +80,7 @@ it('falls back to the configured key when the argument is an empty string', func
     // the command ran against no licence key at all.
     config()->set('license-verifier.license_key', 'CONFIGURED-KEY');
 
-    $command = new ReflectionClass(Simtabi\Laranail\Licence\Verifier\Commands\LicenseInfoCommand::class);
+    $command = new ReflectionClass(LicenseInfoCommand::class);
     $source = (string) file_get_contents((string) $command->getFileName());
 
     expect($source)->not->toContain("\$this->argument('key') ??")
