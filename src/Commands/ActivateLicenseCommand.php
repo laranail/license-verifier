@@ -15,7 +15,7 @@ final class ActivateLicenseCommand extends Command
 
     public function handle(LicenseManager $manager): int
     {
-        $licenseKey = $this->argument('key') ?? config('license-verifier.license_key');
+        $licenseKey = $this->strArgOrNull('key') ?? config('license-verifier.license_key');
 
         if (! $licenseKey) {
             $licenseKey = $this->ask('Please enter your license key');

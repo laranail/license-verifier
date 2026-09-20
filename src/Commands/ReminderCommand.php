@@ -29,7 +29,7 @@ final class ReminderCommand extends Command
 
     private function skip(ReminderManager $reminder): int
     {
-        $days = $this->option('days') !== null ? (int) $this->option('days') : null;
+        $days = $this->intOption('days');
         $reminder->skip($days);
 
         $this->services->display()->success(
