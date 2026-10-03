@@ -14,21 +14,38 @@ Requires PHP `^8.4.1 || ^8.5` on Laravel `^13`.
 
 ```bash
 composer require laranail/license-verifier
-php artisan vendor:publish --tag=license-verifier-config
+php artisan vendor:publish --tag=laranail::license-verifier-config
 ```
 
 See [Installation](docs/installation.md) for the migration publish and the guided installer.
 
-## Quick start
+## Quick start guide and usage
 
-Set the active driver and credentials in `.env` (prefix `LICENSE_VERIFIER_*`):
+### Getting started
 
-```dotenv
-LICENSE_VERIFIER_DRIVER=paseto
-LICENSE_VERIFIER_SERVER_URL=https://licensing.example.com
-LICENSE_VERIFIER_PUBLIC_KEY=...
-LICENSE_VERIFIER_KEY=YOUR-LICENSE-KEY
-```
+1. Run the guided installer, which publishes the config and offers the migration (needed only for
+   the `database` storage backend or the `model` license-detail source):
+
+   ```bash
+   php artisan laranail::license-verifier.install
+   ```
+
+2. Set the active driver and credentials in `.env` (prefix `LICENSE_VERIFIER_*`):
+
+   ```dotenv
+   LICENSE_VERIFIER_DRIVER=paseto
+   LICENSE_VERIFIER_SERVER_URL=https://licensing.example.com
+   LICENSE_VERIFIER_PUBLIC_KEY=...
+   LICENSE_VERIFIER_KEY=YOUR-LICENSE-KEY
+   ```
+
+3. Verify the setup:
+
+   ```bash
+   php artisan laranail::license-verifier.doctor
+   ```
+
+### Usage
 
 Activate and verify — the same API for every provider:
 

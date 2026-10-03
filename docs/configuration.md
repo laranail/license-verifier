@@ -4,7 +4,7 @@ Every key in `config/license-verifier.php`, its env var (prefix `LICENSE_VERIFIE
 `LICENSING_*` prefix is read as a fallback), and what it controls.
 
 ```bash
-php artisan vendor:publish --tag=license-verifier-config
+php artisan vendor:publish --tag=laranail::license-verifier-config
 ```
 
 ## Driver selection
