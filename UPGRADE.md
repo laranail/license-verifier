@@ -16,7 +16,7 @@ The published config is now `config/license-verifier.php` (was `licensing-client
 ```bash
 # remove the old published file and re-publish
 rm config/licensing-client.php
-php artisan vendor:publish --tag=license-verifier-config
+php artisan vendor:publish --tag=laranail::license-verifier-config
 ```
 
 All `config('licensing-client.*')` calls become `config('license-verifier.*')`.
@@ -46,7 +46,7 @@ with added columns (`driver`, `domain`, `licensed_to`, `status`). Re-publish and
 migration if you use the database store:
 
 ```bash
-php artisan vendor:publish --tag=license-verifier-migrations
+php artisan vendor:publish --tag=laranail::license-verifier-migrations
 php artisan migrate
 ```
 

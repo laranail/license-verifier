@@ -7,7 +7,7 @@ and wire the CI gate.
 
 ```bash
 composer require laranail/license-verifier
-php artisan vendor:publish --tag=license-verifier-config
+php artisan vendor:publish --tag=laranail::license-verifier-config
 ```
 
 Pick the driver and credentials in `.env` (see [Installation](installation.md)). One config value

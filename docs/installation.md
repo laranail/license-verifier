@@ -10,14 +10,14 @@ The `LicenceVerifierServiceProvider` (built on `laranail/package-tools`) and the
 `LicenseVerifier` facade alias are auto-discovered. Publish the config to customise it:
 
 ```bash
-php artisan vendor:publish --tag=license-verifier-config
+php artisan vendor:publish --tag=laranail::license-verifier-config
 ```
 
 If you use the `database` storage backend or the `model` license-detail source, publish and run
 the migration too:
 
 ```bash
-php artisan vendor:publish --tag=license-verifier-migrations
+php artisan vendor:publish --tag=laranail::license-verifier-migrations
 php artisan migrate
 ```
 
