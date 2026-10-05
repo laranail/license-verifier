@@ -66,6 +66,9 @@ final class LicenceVerifierServiceProvider extends PackageServiceProvider
             ->hasConfigFile('license-verifier')
             ->withoutConfigNamespacing()
             ->hasTranslations('laranail-license-verifier')
+            // The opt-in API's health route was `license-verifier.health` until 0.1. It keeps
+            // resolving, with a deprecation notice, until the next minor after 0.1.
+            ->hasDeprecatedRouteNames(map: ['license-verifier.health' => 'laranail-license-verifier.health'])
             ->hasMigration('create_license_verifier_table')
             ->hasCommands(
                 ActivateLicenseCommand::class,

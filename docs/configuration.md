@@ -80,7 +80,7 @@ every backend (see [Security](security.md)):
 | `reminder.default_skip_days` | Default length of a reminder skip (`license:reminder skip`). |
 | `ip` | Static IP override or lookup URL/timeout for device fingerprinting. |
 | `debug` | Verbose diagnostics. |
-| `api` | Opt-in health endpoint — `GET {prefix}/health` returns the doctor checks as JSON (`200` healthy / `503` degraded) for monitoring. Off by default. |
+| `api` | Opt-in health endpoint — `GET {prefix}/health`, route `laranail-license-verifier.health`, returns the doctor checks as JSON (`200` healthy / `503` degraded) for monitoring. Off by default. The old name `license-verifier.health` is a deprecated alias that still resolves through `route()` until the next minor after 0.1. |
 
 ## Runtime overrides
 
