@@ -80,8 +80,12 @@ class TestCase extends Orchestra
     protected function initializeTestProperties(): void
     {
         if (! $this->privateKey instanceof AsymmetricSecretKey) {
-            // Generate test keys for PASETO v4
-            $this->privateKey = AsymmetricSecretKey::generate(new Version4);
+            // Generate test keys for PASETO v4. paragonie/paseto 3.5's AsymmetricSecretKey::raw()
+            // runs dos2unix over the binary key, so a key containing the bytes \r\n loses one and
+            // cannot sign (about 1 draw in 1,000). Draw until the key survives raw() intact.
+            do {
+                $this->privateKey = AsymmetricSecretKey::generate(new Version4);
+            } while (strlen($this->privateKey->raw()) !== SODIUM_CRYPTO_SIGN_SECRETKEYBYTES);
             $this->publicKey = $this->privateKey->getPublicKey();
 
             // Set test storage path
