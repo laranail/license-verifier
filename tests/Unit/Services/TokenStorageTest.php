@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Contracts\LicenseStore;
 
@@ -11,7 +12,7 @@ beforeEach(function (): void {
 });
 
 it('stores and retrieves a token', function (): void {
-    $token = 'test-token-123';
+    $token = TestCredentials::secret('stored');
     $key = 'test-key';
 
     $this->storage->store($token, $key);
@@ -21,7 +22,7 @@ it('stores and retrieves a token', function (): void {
 });
 
 it('encrypts the token at rest', function (): void {
-    $token = 'sensitive-token';
+    $token = TestCredentials::secret('sensitive');
     $key = 'encryption-test';
 
     $this->storage->store($token, $key);
@@ -42,7 +43,7 @@ it('returns null when token does not exist', function (): void {
 });
 
 it('deletes a stored token', function (): void {
-    $token = 'token-to-delete';
+    $token = TestCredentials::secret('deleted');
     $key = 'delete-test';
 
     $this->storage->store($token, $key);
@@ -54,7 +55,7 @@ it('deletes a stored token', function (): void {
 });
 
 it('checks if token exists', function (): void {
-    $token = 'existence-test';
+    $token = TestCredentials::secret('existing');
     $key = 'exists-test';
 
     expect($this->storage->exists($key))->toBeFalse();
