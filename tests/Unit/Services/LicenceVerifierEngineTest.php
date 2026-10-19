@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Simtabi\Laranail\Licence\Verifier\LicenceVerifier;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
 use Simtabi\Laranail\Licence\Verifier\Services\LicensingApiClient;
@@ -40,14 +41,14 @@ it('activates a license successfully', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'             => 'activated-token',
+                'token'             => TestCredentials::secret('activated-token'),
                 'refresh_after'     => '2027-01-07T00:00:00+00:00',
                 'public_key_bundle' => ['signing' => ['kid' => 'k1']],
             ],
         ]);
 
     $this->tokenStorage->shouldReceive('store')
-        ->with('activated-token', 'TEST-KEY')
+        ->with(TestCredentials::secret('activated-token'), 'TEST-KEY')
         ->once();
 
     $this->tokenStorage->shouldReceive('storeLastHeartbeat')
@@ -156,11 +157,11 @@ it('refreshes a license token', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => ['token' => 'refreshed-token'],
+            'data'    => ['token' => TestCredentials::secret('refreshed-token')],
         ]);
 
     $this->tokenStorage->shouldReceive('store')
-        ->with('refreshed-token', 'TEST-KEY')
+        ->with(TestCredentials::secret('refreshed-token'), 'TEST-KEY')
         ->once();
 
     $this->tokenStorage->shouldReceive('storeLastHeartbeat')
@@ -440,7 +441,7 @@ it('applies public key bundle when activating', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'             => 'test-token',
+                'token'             => TestCredentials::secret('licence-token'),
                 'public_key_bundle' => $bundle,
             ],
         ]);
@@ -484,7 +485,7 @@ it('stores entitlements from server response', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'   => 'test-token',
+                'token'   => TestCredentials::secret('licence-token'),
                 'license' => [
                     'entitlements' => ['api_access', 'premium'],
                 ],

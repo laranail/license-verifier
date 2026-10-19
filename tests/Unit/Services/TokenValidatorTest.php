@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Licence\Verifier\Services\TokenValidator;
 use Simtabi\Laranail\Licence\Verifier\Exceptions\LicensingException;
 use Simtabi\Laranail\Licence\Verifier\Services\FingerprintGenerator;
@@ -23,7 +24,7 @@ it('validates a valid token', function (): void {
 });
 
 it('throws exception for invalid token', function (): void {
-    $this->validator->validate('invalid-token');
+    $this->validator->validate(TestCredentials::secret('invalid-token'));
 })->throws(LicensingException::class);
 
 it('throws exception for expired token', function (): void {
@@ -73,7 +74,7 @@ it('allows unlimited usage when max_usages is -1', function (): void {
 
 it('checks if token is valid without throwing exceptions', function (): void {
     $validToken = $this->generateTestToken();
-    $invalidToken = 'invalid-token';
+    $invalidToken = TestCredentials::secret('invalid-token');
 
     expect($this->validator->isValid($validToken))->toBeTrue();
     expect($this->validator->isValid($invalidToken))->toBeFalse();
@@ -92,7 +93,7 @@ it('gets token expiration date', function (): void {
 });
 
 it('returns null for invalid token expiration', function (): void {
-    expect($this->validator->getExpiration('invalid-token'))->toBeNull();
+    expect($this->validator->getExpiration(TestCredentials::secret('invalid-token')))->toBeNull();
 });
 
 it('checks if token is expiring soon', function (): void {
@@ -128,7 +129,7 @@ it('extracts license information from token', function (): void {
 });
 
 it('returns empty array for invalid token when extracting info', function (): void {
-    $info = $this->validator->extractLicenseInfo('invalid-token');
+    $info = $this->validator->extractLicenseInfo(TestCredentials::secret('invalid-token'));
 
     expect($info)->toBe([]);
 });

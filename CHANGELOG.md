@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Test credentials are generated at run time with `TestCredentials` instead of being written into
+  the tests, and `tests/Architecture/NoLiteralCredentialsTest.php` fails the suite on any literal
+  credential left behind, so secret scanning has nothing to report. The `laranail/package-tools`
+  floor is now `^0.1.9`, the first release shipping those helpers.
+
 - `laravel/framework ^13.0` is now declared in `require`. `src/` uses `Dispatchable` from `Illuminate\Foundation`, which no `illuminate/*` component ships, so the dependency only arrived through the host application.
 - **The opt-in API's health route is named `laranail-license-verifier.health`**, was
   `license-verifier.health`. Route names share one flat registry with the host and every other
