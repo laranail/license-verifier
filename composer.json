@@ -43,7 +43,7 @@
         "laravel/framework": "^13.0",
         "guzzlehttp/guzzle": "^8.1",
         "paragonie/paseto": "^3.5",
-        "laranail/package-tools": "^0.1.9",
+        "laranail/package-tools": "^0.1.10",
         "laranail/console": "^0.1"
     },
     "require-dev": {

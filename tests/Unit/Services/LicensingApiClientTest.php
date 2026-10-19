@@ -16,7 +16,7 @@ it('activates a license successfully', function (): void {
         '*/api/licensing/v1/activate' => Http::response([
             'success' => true,
             'data'    => [
-                'token'            => TestCredentials::secret('activated-token'),
+                'token'            => TestCredentials::secret('activated'),
                 'token_expires_at' => now()->addYear()->toIso8601String(),
                 'license'          => ['id' => 'ulid-1', 'status' => 'active'],
                 'usage'            => ['id' => 1, 'fingerprint' => 'fp', 'status' => 'active'],
@@ -27,7 +27,7 @@ it('activates a license successfully', function (): void {
     $result = $this->apiClient->activate('LICENSE-KEY', 'fingerprint', ['meta' => 'data']);
 
     expect($result)->toHaveKey('data');
-    expect($result['data']['token'])->toBe(TestCredentials::secret('activated-token'));
+    expect($result['data']['token'])->toBe(TestCredentials::secret('activated'));
 });
 
 it('throws exception for invalid license key during activation', function (): void {
@@ -97,7 +97,7 @@ it('refreshes a token successfully', function (): void {
         '*/api/licensing/v1/refresh' => Http::response([
             'success' => true,
             'data'    => [
-                'token'            => TestCredentials::secret('refreshed-token'),
+                'token'            => TestCredentials::secret('refreshed'),
                 'token_expires_at' => now()->addYear()->toIso8601String(),
                 'refresh_after'    => now()->addDays(6)->toIso8601String(),
             ],
@@ -107,7 +107,7 @@ it('refreshes a token successfully', function (): void {
     $result = $this->apiClient->refresh('LICENSE-KEY', 'fingerprint');
 
     expect($result)->toHaveKey('data');
-    expect($result['data']['token'])->toBe(TestCredentials::secret('refreshed-token'));
+    expect($result['data']['token'])->toBe(TestCredentials::secret('refreshed'));
 });
 
 it('throws exception for fingerprint mismatch during refresh', function (): void {

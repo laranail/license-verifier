@@ -41,14 +41,14 @@ it('activates a license successfully', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'             => TestCredentials::secret('activated-token'),
+                'token'             => TestCredentials::secret('activated'),
                 'refresh_after'     => '2027-01-07T00:00:00+00:00',
                 'public_key_bundle' => ['signing' => ['kid' => 'k1']],
             ],
         ]);
 
     $this->tokenStorage->shouldReceive('store')
-        ->with(TestCredentials::secret('activated-token'), 'TEST-KEY')
+        ->with(TestCredentials::secret('activated'), 'TEST-KEY')
         ->once();
 
     $this->tokenStorage->shouldReceive('storeLastHeartbeat')
@@ -157,11 +157,11 @@ it('refreshes a license token', function (): void {
         ->once()
         ->andReturn([
             'success' => true,
-            'data'    => ['token' => TestCredentials::secret('refreshed-token')],
+            'data'    => ['token' => TestCredentials::secret('refreshed')],
         ]);
 
     $this->tokenStorage->shouldReceive('store')
-        ->with(TestCredentials::secret('refreshed-token'), 'TEST-KEY')
+        ->with(TestCredentials::secret('refreshed'), 'TEST-KEY')
         ->once();
 
     $this->tokenStorage->shouldReceive('storeLastHeartbeat')
@@ -441,7 +441,7 @@ it('applies public key bundle when activating', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'             => TestCredentials::secret('licence-token'),
+                'token'             => TestCredentials::secret('licence'),
                 'public_key_bundle' => $bundle,
             ],
         ]);
@@ -485,7 +485,7 @@ it('stores entitlements from server response', function (): void {
         ->andReturn([
             'success' => true,
             'data'    => [
-                'token'   => TestCredentials::secret('licence-token'),
+                'token'   => TestCredentials::secret('licence'),
                 'license' => [
                     'entitlements' => ['api_access', 'premium'],
                 ],

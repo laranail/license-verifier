@@ -12,7 +12,7 @@ beforeEach(function (): void {
 });
 
 it('stores and retrieves a token', function (): void {
-    $token = TestCredentials::secret('stored-token');
+    $token = TestCredentials::secret('stored');
     $key = 'test-key';
 
     $this->storage->store($token, $key);
@@ -22,7 +22,7 @@ it('stores and retrieves a token', function (): void {
 });
 
 it('encrypts the token at rest', function (): void {
-    $token = TestCredentials::secret('sensitive-token');
+    $token = TestCredentials::secret('sensitive');
     $key = 'encryption-test';
 
     $this->storage->store($token, $key);
@@ -43,7 +43,7 @@ it('returns null when token does not exist', function (): void {
 });
 
 it('deletes a stored token', function (): void {
-    $token = TestCredentials::secret('deleted-token');
+    $token = TestCredentials::secret('deleted');
     $key = 'delete-test';
 
     $this->storage->store($token, $key);
@@ -55,7 +55,7 @@ it('deletes a stored token', function (): void {
 });
 
 it('checks if token exists', function (): void {
-    $token = TestCredentials::secret('existing-token');
+    $token = TestCredentials::secret('existing');
     $key = 'exists-test';
 
     expect($this->storage->exists($key))->toBeFalse();

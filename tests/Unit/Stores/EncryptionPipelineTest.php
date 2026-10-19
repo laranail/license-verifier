@@ -15,26 +15,26 @@ use Simtabi\Laranail\Licence\Verifier\Services\TokenStorage;
 it('stores the token encrypted at rest in the database store', function (): void {
     (new DatabaseStore)->put('K', [
         'key'      => 'K',
-        'token'    => TestCredentials::secret('stored-token'),
+        'token'    => TestCredentials::secret('stored'),
         'metadata' => ['hidden' => 'SECRET-META'],
     ]);
 
     $raw = DB::table('license_verifier_licenses')->where('key', 'K')->first();
 
     // Token + metadata columns are ciphertext, not the plaintext.
-    expect($raw->token)->not->toContain(TestCredentials::secret('stored-token'))
+    expect($raw->token)->not->toContain(TestCredentials::secret('stored'))
         ->and($raw->metadata)->not->toContain('SECRET-META')
         // …but the store decrypts transparently on read.
-        ->and((new DatabaseStore)->get('K')['token'])->toBe(TestCredentials::secret('stored-token'));
+        ->and((new DatabaseStore)->get('K')['token'])->toBe(TestCredentials::secret('stored'));
 });
 
 it('encrypts cache-store payloads at rest', function (): void {
-    new CacheStore('array')->put('K', ['token' => TestCredentials::secret('cached-token')]);
+    new CacheStore('array')->put('K', ['token' => TestCredentials::secret('cached')]);
 
     $raw = Cache::store('array')->get('license-verifier:record:' . hash('sha256', 'K'));
 
-    expect($raw)->toBeString()->not->toContain(TestCredentials::secret('cached-token'))
-        ->and(new CacheStore('array')->get('K')['token'])->toBe(TestCredentials::secret('cached-token'));
+    expect($raw)->toBeString()->not->toContain(TestCredentials::secret('cached'))
+        ->and(new CacheStore('array')->get('K')['token'])->toBe(TestCredentials::secret('cached'));
 });
 
 it('exposes the active token through currentToken (PASETO)', function (): void {
@@ -50,14 +50,14 @@ it('writes FileStore records atomically with owner-only permissions', function (
     $path = sys_get_temp_dir() . '/lv-fs-' . uniqid();
     $store = new FileStore($path);
 
-    $store->put('K', ['token' => TestCredentials::secret('cached-token')]);
+    $store->put('K', ['token' => TestCredentials::secret('cached')]);
 
     $file = $path . '/records/' . hash('sha256', 'K') . '.json';
 
     expect(File::exists($file))->toBeTrue()
         ->and(substr(sprintf('%o', fileperms($file)), -4))->toBe('0600') // owner-only
-        ->and(File::get($file))->not->toContain(TestCredentials::secret('cached-token')) // ciphertext
-        ->and($store->get('K')['token'])->toBe(TestCredentials::secret('cached-token')) // round-trips
+        ->and(File::get($file))->not->toContain(TestCredentials::secret('cached')) // ciphertext
+        ->and($store->get('K')['token'])->toBe(TestCredentials::secret('cached')) // round-trips
         // no leftover temp files from the atomic write
         ->and(collect(File::files($path . '/records'))->filter(fn ($f): bool => str_contains($f->getFilename(), '.tmp')))->toBeEmpty();
 
@@ -67,8 +67,8 @@ it('writes FileStore records atomically with owner-only permissions', function (
 it('treats a non-positive cache TTL as forever (never immediate-expiry)', function (): void {
     $store = new CacheStore('array', 0);
 
-    $store->put('K', ['token' => TestCredentials::secret('persisted-token')]);
+    $store->put('K', ['token' => TestCredentials::secret('persisted')]);
 
     // ttl 0 must not evict immediately.
-    expect($store->get('K'))->toBe(['token' => TestCredentials::secret('persisted-token')]);
+    expect($store->get('K'))->toBe(['token' => TestCredentials::secret('persisted')]);
 });
