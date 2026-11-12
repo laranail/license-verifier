@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The grace period never applied when the cache store serializes values with
+  `cache.serializable_classes` restricted.** `LicenseManager` cached its last good result as
+  `['result' => VerificationResult, 'at' => int]`, a PHP object. Laravel 13 unserializes only the
+  classes listed in `cache.serializable_classes` (default `false`), so under Redis, the database
+  store or a serializing array store the entry came back as `__PHP_Incomplete_Class`, was read as
+  a miss, and an unreachable licence server locked the install out at once instead of serving
+  `Grace` for `grace_period_days`. A fresh entry was ignored the same way, so every check went to
+  the network. The entry is now plain data (`VerificationResult::toArray()` plus `raw`, and `at`),
+  rebuilt into a `VerificationResult` on read. An entry that does not rebuild -- the old object
+  format, an unknown status, a missing field -- counts as a miss, so the first check after
+  upgrading goes to the licence server once. Applications that allow-listed `VerificationResult`
+  and `LicenseStatus` in `cache.serializable_classes` as a workaround can remove them.
+
 - **`laranail::license-verifier.watch --cycles=` looped forever**, including in a non-interactive
   run. `--cycles=` and `--cycles=abc` both reach `(int)` and become `0`; the loop breaks on
   `++$count === $cycles` with `$count` starting at 1, so `0` never matches. The `null` guard above
