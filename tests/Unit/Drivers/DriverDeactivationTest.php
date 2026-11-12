@@ -39,7 +39,7 @@ it('deletes the Freemius install on deactivate, then forgets locally', function 
 });
 
 it('still succeeds and forgets locally when the provider deactivate call fails', function (): void {
-    Http::fake(['api.cryptolens.io/*' => fn () => throw new ConnectionException('down')]);
+    Http::fake(['api.cryptolens.io/*' => fn (): never => throw new ConnectionException('down')]);
 
     $driver = new CryptolensDriver(['token' => 't', 'product_id' => '1', 'base_url' => 'https://api.cryptolens.io']);
 

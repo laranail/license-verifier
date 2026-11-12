@@ -561,7 +561,40 @@ class LicenseManager
     {
         $entry = $this->cache()->get($this->cacheKey($key));
 
-        return is_array($entry) && ($entry['result'] ?? null) instanceof VerificationResult ? $entry : null;
+        if (! is_array($entry) || ! is_int($entry['at'] ?? null) || ! is_array($entry['result'] ?? null)) {
+            return null; // absent, unreadable, or the pre-plain-data object format: a miss
+        }
+
+        $result = $this->resultFromCache($entry['result']);
+
+        return $result instanceof VerificationResult ? ['result' => $result, 'at' => $entry['at']] : null;
+    }
+
+    /**
+     * Rebuild a result from the plain array {@see storeEntry()} wrote, or null when
+     * the data does not describe one (an unknown status, a missing field).
+     *
+     * @param array<array-key, mixed> $data
+     */
+    private function resultFromCache(array $data): ?VerificationResult
+    {
+        $status = is_string($data['status'] ?? null) ? LicenseStatus::tryFrom($data['status']) : null;
+
+        if ($status === null || ! is_bool($data['valid'] ?? null)) {
+            return null;
+        }
+
+        $string = static fn (string $field): ?string => is_string($data[$field] ?? null) ? $data[$field] : null;
+
+        return new VerificationResult(
+            status: $status,
+            valid: $data['valid'],
+            message: $string('message'),
+            licensedTo: $string('licensed_to'),
+            activatedAt: $string('activated_at'),
+            expiresAt: $string('expires_at'),
+            raw: is_array($data['raw'] ?? null) ? $data['raw'] : [],
+        );
     }
 
     private function forgetCache(?string $key): void
@@ -577,7 +610,10 @@ class LicenseManager
 
         $this->cache()->put(
             $this->cacheKey($key),
-            ['result' => $result, 'at' => now()->getTimestamp()],
+            // Plain data only: a store that serializes (Redis, database) under
+            // Laravel's cache.serializable_classes would hand an object back as
+            // __PHP_Incomplete_Class, and the grace period would never apply.
+            ['result' => $result->toArray() + ['raw' => $result->raw], 'at' => now()->getTimestamp()],
             Carbon::now()->addDays(max(1, $graceDays)),
         );
     }
